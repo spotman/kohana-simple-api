@@ -32,7 +32,11 @@ abstract class API_Proxy {
         return new $class_name;
     }
 
-    public function model($model = NULL)
+    /**
+     * @param API_Model|null $model
+     * @return $this|API_Model
+     */
+    public function model(API_Model $model = NULL)
     {
         if ( $model === NULL )
             return $this->_model;
@@ -46,9 +50,9 @@ abstract class API_Proxy {
         return $this->call($method, $arguments);
     }
 
-    abstract protected function call($method, $arguments);
+    abstract protected function call($method, array $arguments);
 
-    protected function model_call($method, $arguments)
+    protected function model_call($method, array $arguments)
     {
         $object = $this->model();
 
@@ -61,6 +65,28 @@ abstract class API_Proxy {
         API_Model::check_result_type($result);
 
         return $result;
+    }
+
+    // TODO
+    protected function get_named_method_args($class, $method, array $runtime_arguments = array())
+    {
+        $reflector = new ReflectionMethod($class, $method);
+        $parameters = $reflector->getParameters();
+
+        $args = array();
+
+        foreach ( $parameters as $parameter )
+        {
+            $position = $parameter->getPosition();
+
+            if ( ! isset( $runtime_arguments[ $position ] ) )
+                continue;
+
+            $name = $parameter->getName();
+            $args[ $name ] = $runtime_arguments[ $position ];
+        }
+
+        return $args;
     }
 
 }

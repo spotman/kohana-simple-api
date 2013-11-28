@@ -5,11 +5,16 @@ abstract class Core_API {
 
     const VERSION = 1;
 
+    /**
+     * API transport factory, shorthand to API_Transport::by_type()
+     * @param integer|null $type Transport type constant like API_Transport::JSON_RPC
+     * @return API_Transport|API_Transport_JsonRPC
+     */
     public static function transport($type = NULL)
     {
         if ( $type === NULL )
         {
-            $type = static::config()->get('transport', API_Proxy::INTERNAL);
+            $type = static::config()->get('transport', API_Transport::JSON_RPC);
         }
 
         return API_Transport::by_type($type);

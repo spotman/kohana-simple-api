@@ -29,4 +29,12 @@ abstract class Core_API_Transport {
         return new $class_name;
     }
 
+    /**
+     * @param $resource
+     * @param $method
+     * @param $arguments
+     * @return mixed
+     */
+    abstract public function remote_procedure_call($resource, $method, $arguments);
+
 }

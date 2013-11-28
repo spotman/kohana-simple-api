@@ -3,6 +3,11 @@
 
 abstract class API_Model {
 
+    /**
+     * @var string Model name
+     */
+    protected $_name;
+
     protected static $_allowed_result_types = array('null', 'boolean', 'string', 'integer', 'double');
 
     /**
@@ -11,11 +16,29 @@ abstract class API_Model {
      */
     public static function factory($name = NULL)
     {
+        // TODO Why this?
         if ( ! $name )
             return new static;
 
         $class_name = __CLASS__.'_'.$name;
-        return new $class_name;
+
+        /** @var API_Model $object */
+        $object = new $class_name;
+
+        return $object->name($name);
+    }
+
+    /**
+     * @param string|null $value
+     * @return $this|string
+     */
+    public function name($value = NULL)
+    {
+        if ( $value === NULL )
+            return $this->_name;
+
+        $this->_name = $value;
+        return $this;
     }
 
     public static function check_result_type($data)
@@ -30,6 +53,7 @@ abstract class API_Model {
         }
     }
 
+    // TODO
     protected static function check_result_object($object)
     {
 //        if ( $object instanceof Iterator )
