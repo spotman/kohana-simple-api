@@ -11,19 +11,30 @@ abstract class API_Model {
     protected static $_allowed_result_types = array('null', 'boolean', 'string', 'integer', 'double');
 
     /**
-     * @param null $name
+     * @param string|null $name
      * @return static
+     * @throws API_Model_Exception
      */
     public static function factory($name = NULL)
     {
-        // TODO Why this?
-        if ( ! $name )
-            return new static;
+        if ( $name )
+        {
+            $class_name = __CLASS__.'_'.$name;
 
-        $class_name = __CLASS__.'_'.$name;
+            /** @var API_Model $object */
+            $object = new $class_name;
+        }
+        // Allow concrete initialization via Api_Model_User::factory()
+        else
+        {
+            /** @var API_Model $object */
+            $object = new static;
+        }
 
-        /** @var API_Model $object */
-        $object = new $class_name;
+        if ( ! ($object instanceof API_Model) )
+            throw new API_Model_Exception('The class :class must be the instance of API_Model',
+                array(':class' => get_class($object))
+            );
 
         return $object->name($name);
     }
