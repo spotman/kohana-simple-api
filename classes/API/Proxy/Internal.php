@@ -8,7 +8,7 @@ class API_Proxy_Internal extends API_Proxy {
      * @param array $arguments
      * @return mixed
      */
-    protected function call($method, $arguments)
+    protected function call($method, array $arguments)
     {
         return $this->model_call($method, $arguments);
     }

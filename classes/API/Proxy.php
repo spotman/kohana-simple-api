@@ -10,6 +10,8 @@ abstract class API_Proxy {
         self::EXTERNAL  =>  'External',
     );
 
+    protected static $_allowed_model_result_types = array('null', 'boolean', 'string', 'integer', 'double');
+
     protected $_model;
 
     /**
@@ -54,17 +56,71 @@ abstract class API_Proxy {
 
     protected function model_call($method, array $arguments)
     {
-        $object = $this->model();
+        $model = $this->model();
 
-        if ( ! method_exists($object, $method) )
+        if ( ! is_callable(array($model, $method)) )
             throw new API_Proxy_Exception('Unknown method :method in proxy object :class',
-                array(':method' => $method, ':class' => get_class($object)));
+                array(':method' => $method, ':class' => get_class($model)));
 
-        $result = call_user_func_array(array($object, $method), $arguments);
+        // TODO deal with missed/unordered arguments
 
-        API_Model::check_result_type($result);
+        $result = call_user_func_array(array($model, $method), $arguments);
 
-        return $result;
+        return $this->convert_result($result);
+    }
+
+    protected function convert_result($model_call_result)
+    {
+        if ( is_object($model_call_result) )
+        {
+            return $this->convert_result_object($model_call_result);
+        }
+        else if ( is_array($model_call_result) )
+        {
+            return $this->convert_result_traversable($model_call_result);
+        }
+        else
+        {
+            return $this->convert_result_simple($model_call_result);
+        }
+    }
+
+    protected function convert_result_object($object)
+    {
+        if ( $object instanceof API_Model_Result )
+        {
+            return $object->get_api_result_data();
+        }
+        else if ( $object instanceof Traversable )
+        {
+            return $this->convert_result_traversable($object);
+        }
+        else
+            throw new API_Model_Exception(
+                'Api model method may return objects implementing Traversable or API_Model_Result only'
+            );
+    }
+
+    protected function convert_result_traversable($traversable)
+    {
+        $data = array();
+
+        foreach ( $traversable as $key => $value )
+        {
+            $data[$key] = $this->convert_result($value);
+        }
+
+        return $data;
+    }
+
+    protected function convert_result_simple($data)
+    {
+        $type = gettype($data);
+
+        if ( ! in_array(strtolower($type), static::$_allowed_model_result_types) )
+            throw new API_Model_Exception('API model must not return values of type :type', array(':type' => $type));
+
+        return $data;
     }
 
     // TODO
@@ -90,4 +146,3 @@ abstract class API_Proxy {
     }
 
 }
-
