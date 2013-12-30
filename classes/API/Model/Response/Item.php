@@ -5,6 +5,6 @@ interface API_Model_Response_Item {
     /**
      * @return array|Traversable
      */
-    public function get_api_result_data();
+    public function get_api_response_data();
 
 }
