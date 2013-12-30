@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-interface API_Model_Result {
+interface API_Model_Response_Item {
 
     /**
      * @return array|Traversable
