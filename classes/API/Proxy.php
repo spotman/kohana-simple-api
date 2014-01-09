@@ -49,9 +49,16 @@ abstract class API_Proxy {
 
     final public function __call($method, $arguments)
     {
-        return $this->call($method, $arguments);
+        $data = $this->call($method, $arguments);
+
+        return API_Response::factory()->from_array($data);
     }
 
+    /**
+     * @param $method
+     * @param array $arguments
+     * @return array
+     */
     abstract protected function call($method, array $arguments);
 
     protected function model_call($method, array $arguments)
@@ -64,63 +71,25 @@ abstract class API_Proxy {
 
         // TODO deal with missed/unordered arguments
 
+        /** @var API_Response $result */
         $result = call_user_func_array(array($model, $method), $arguments);
 
-        return $this->convert_result($result);
-    }
+        // For model methods without response
+        if ( $result === NULL )
+        {
+            $result = API::response();
+        }
+//        else if ( ! ($result instanceof API_Response) )
+//        {
+//            $result = API::response()->set_data($result);
+//        }
 
-    protected function convert_result($model_call_result)
-    {
-        if ( is_object($model_call_result) )
-        {
-            return $this->convert_result_object($model_call_result);
-        }
-        else if ( is_array($model_call_result) )
-        {
-            return $this->convert_result_traversable($model_call_result);
-        }
-        else
-        {
-            return $this->convert_result_simple($model_call_result);
-        }
-    }
-
-    protected function convert_result_object($object)
-    {
-        if ( $object instanceof API_Model_Result )
-        {
-            return $object->get_api_result_data();
-        }
-        else if ( $object instanceof Traversable )
-        {
-            return $this->convert_result_traversable($object);
-        }
-        else
+        if ( ! ($result instanceof API_Response) )
             throw new API_Model_Exception(
-                'Api model method may return objects implementing Traversable or API_Model_Result only'
+                'Api model method must return API_Response objects only'
             );
-    }
 
-    protected function convert_result_traversable($traversable)
-    {
-        $data = array();
-
-        foreach ( $traversable as $key => $value )
-        {
-            $data[$key] = $this->convert_result($value);
-        }
-
-        return $data;
-    }
-
-    protected function convert_result_simple($data)
-    {
-        $type = gettype($data);
-
-        if ( ! in_array(strtolower($type), static::$_allowed_model_result_types) )
-            throw new API_Model_Exception('API model must not return values of type :type', array(':type' => $type));
-
-        return $data;
+        return $result->as_array();
     }
 
     // TODO

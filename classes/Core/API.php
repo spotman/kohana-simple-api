@@ -20,9 +20,18 @@ abstract class Core_API {
         return API_Transport::by_type($type);
     }
 
+    // TODO remove
     public static function is_server_enabled()
     {
-        return (bool) static::config()->get('server_enabled', FALSE);
+        return (bool) static::config()->get('server.enabled', FALSE);
+    }
+
+    /**
+     * @return API_Response
+     */
+    public static function response()
+    {
+        return API_Response::factory();
     }
 
     /**

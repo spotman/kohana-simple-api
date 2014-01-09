@@ -13,7 +13,7 @@ abstract class API_Model {
      * @return static
      * @throws API_Model_Exception
      */
-    public static function factory($name = NULL)
+    public static function factory($name)
     {
         if ( $name )
         {
@@ -48,6 +48,15 @@ abstract class API_Model {
 
         $this->_name = $value;
         return $this;
+    }
+
+    /**
+     * @param $data
+     * @return API_Response
+     */
+    protected function response($data)
+    {
+        return API::response()->set_data($data);
     }
 
 }
