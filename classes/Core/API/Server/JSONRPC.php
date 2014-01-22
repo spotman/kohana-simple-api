@@ -10,11 +10,9 @@ class Core_API_Server_JSONRPC extends API_Server {
      */
     public function process(Request $request, Response $response)
     {
-        $fake = '{"jsonrpc": "2.0", "method": "Lot_Category.all", "id": 1}';
-
         JSONRPC_Server::factory($response)
             ->register_proxy_factory('API::get')
-            ->process($fake);
+            ->process();
     }
 
 }
