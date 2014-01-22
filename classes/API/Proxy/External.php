@@ -4,8 +4,9 @@ class API_Proxy_External extends API_Proxy {
 
     protected function call($method, array $arguments)
     {
+        // TODO change to API_Client
         // Getting transport
-        $transport = API::transport();
+        $transport = API::server();
 
         $resource = $this->model()->name();
 

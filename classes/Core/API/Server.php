@@ -1,12 +1,12 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-abstract class Core_API_Transport {
+abstract class Core_API_Server {
 
     const JSON_RPC = 1;
 
     protected static $_type_to_class_name = array(
-        self::JSON_RPC  =>  'JsonRPC',
+        self::JSON_RPC  =>  'JSONRPC',
     );
 
     /**
@@ -25,16 +25,16 @@ abstract class Core_API_Transport {
      */
     public static function factory($name)
     {
-        $class_name = 'API_Transport_'.$name;
+        $class_name = 'API_Server_'.$name;
         return new $class_name;
     }
 
     /**
-     * @param $resource
-     * @param $method
-     * @param $arguments
-     * @return mixed
+     * Process API request and push data to $response
+     *
+     * @param Request $request
+     * @param Response $response
      */
-    abstract public function remote_procedure_call($resource, $method, $arguments);
+    abstract public function process(Request $request, Response $response);
 
 }

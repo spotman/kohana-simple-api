@@ -15,19 +15,13 @@ abstract class API_Model {
      */
     public static function factory($name)
     {
-        if ( $name )
-        {
-            $class_name = __CLASS__.'_'.$name;
+        if ( ! $name )
+            throw new API_Model_Exception('Model name required');
 
-            /** @var API_Model $object */
-            $object = new $class_name;
-        }
-        // Allow concrete initialization via Api_Model_User::factory()
-        else
-        {
-            /** @var API_Model $object */
-            $object = new static;
-        }
+        $class_name = __CLASS__.'_'.$name;
+
+        /** @var API_Model $object */
+        $object = new $class_name;
 
         if ( ! ($object instanceof API_Model) )
             throw new API_Model_Exception('The class :class must be the instance of API_Model',

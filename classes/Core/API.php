@@ -8,22 +8,22 @@ abstract class Core_API {
     /**
      * API transport factory, shorthand to API_Transport::by_type()
      * @param integer|null $type Transport type constant like API_Transport::JSON_RPC
-     * @return API_Transport|API_Transport_JsonRPC
+     * @return API_Server|API_Server_JSONRPC
      */
-    public static function transport($type = NULL)
+    public static function server($type = NULL)
     {
         if ( $type === NULL )
         {
-            $type = static::config()->get('transport', API_Transport::JSON_RPC);
+            $type = static::config('server.type', API_Server::JSON_RPC);
         }
 
-        return API_Transport::by_type($type);
+        return API_Server::by_type($type);
     }
 
     // TODO remove
     public static function is_server_enabled()
     {
-        return (bool) static::config()->get('server.enabled', FALSE);
+        return (bool) static::config('server.enabled', FALSE);
     }
 
     /**
@@ -48,7 +48,7 @@ abstract class Core_API {
      * @param int|null $proxy_type Const API_Proxy::INTERNAL or API_Proxy::EXTERNAL
      * @return API_Proxy
      */
-    protected static function get($name, $proxy_type = NULL)
+    public static function get($name, $proxy_type = NULL)
     {
         $model = static::model($name);
         $proxy = static::proxy($proxy_type);
@@ -58,16 +58,16 @@ abstract class Core_API {
         return $proxy;
     }
 
-    protected static function config()
+    protected static function config($key, $default_value = NULL)
     {
         static $config;
 
         if ( $config === NULL )
         {
-            $config = Kohana::config('api');
+            $config = Kohana::config('api')->as_array();
         }
 
-        return $config;
+        return Arr::path($config, $key, $default_value);
     }
 
     /**
@@ -79,7 +79,7 @@ abstract class Core_API {
     {
         if ( $type === NULL )
         {
-            $type = static::config()->get('proxy', API_Proxy::INTERNAL);
+            $type = static::config('proxy', API_Proxy::INTERNAL);
         }
 
         return API_Proxy::by_type($type);
