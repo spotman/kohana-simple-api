@@ -20,6 +20,9 @@ abstract class API_Model {
 
         $class_name = __CLASS__.'_'.$name;
 
+        if ( ! class_exists($class_name) )
+            throw new API_Model_Exception('Can not find model class :class_name', array(':class_name' => $class_name));
+
         /** @var API_Model $object */
         $object = new $class_name;
 
