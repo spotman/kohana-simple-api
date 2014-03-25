@@ -2,8 +2,9 @@
 
 return array(
 
-    'api'       =>  array(
-        'js'    =>  array('api/api.jquery.plugin.js', 'api/api.definition.js')
-    )
+    // Now we use Require.JS only!
+//    'api'       =>  array(
+//        'js'    =>  array('api/jquery.jsonRPC.js', 'api/rpc.definition.js')
+//    )
 
 );
