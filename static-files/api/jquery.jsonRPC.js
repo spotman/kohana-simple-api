@@ -19,6 +19,16 @@
     }
 }(function ($) {
 
+    var namedHash = function(namedParams)
+    {
+        var params = namedParams;
+
+        this.getParams = function()
+        {
+            return params;
+        };
+    };
+
     /**
      * Thanks to JSON-RPC Tool
      * c. 2012 CJ Holmes - Free for all use provided attribution is given.
@@ -46,17 +56,19 @@
         for (var idx=3; idx<arguments.length; idx++)
             params.push(arguments[idx]);
 
-        // If first parameter is object, then we use it as hash with named parameters
-        if ( params.length > 0 && typeof(params[0]) == "object" )
-        {
-            params = params[0];
-        }
-
         var request = {
             jsonrpc: "2.0",
             id: arguments.callee.requestCount,
             method: resource + "." + method
         };
+
+        if ( params.length > 0 )
+        {
+            // If first parameter is object, then we use it as hash with named parameters
+            request.params = (params[0] instanceof namedHash)
+                ? params[0].getParams()
+                : params;
+        }
 
         if ( params && params.length )
         {
@@ -93,6 +105,8 @@
 
         return jqXHR;
     };
+
+    $.fn.jsonRPC.named = namedHash;
 
     return $.fn.jsonRPC;
 }));
