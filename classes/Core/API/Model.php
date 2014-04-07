@@ -84,7 +84,7 @@ abstract class Core_API_Model {
      * @throws HTTP_Exception_501
      * @return mixed|NULL
      */
-    protected function _save(Model $model, $data)
+    protected function _save($model, $data)
     {
         throw new HTTP_Exception_501;
     }
@@ -99,11 +99,11 @@ abstract class Core_API_Model {
     /**
      * Override this if needed
      *
-     * @param $model
+     * @param Model $model
      * @throws HTTP_Exception_501
      * @return bool
      */
-    protected function _delete(Model $model)
+    protected function _delete($model)
     {
         throw new HTTP_Exception_501;
     }
