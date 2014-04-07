@@ -47,7 +47,78 @@ abstract class Core_API_Model {
         return $this;
     }
 
+    public function one($id)
+    {
+        return $this->response( $this->_one( (int) $id ) );
+    }
+
     /**
+     * Override this if needed
+     *
+     * @param $id
+     * @return Model
+     */
+    protected function _one($id)
+    {
+        return $this->model($id);
+    }
+
+    public function save($data)
+    {
+        $id = ( isset($data->id) AND $data->id )
+            ? $data->id
+            : NULL;
+
+        $model = $this->model($id);
+
+        $response_data = $this->_save($model, $data);
+
+        return $this->response($response_data);
+    }
+
+    /**
+     * Override this method
+     *
+     * @param Model $model
+     * @param $data
+     * @throws HTTP_Exception_501
+     * @return mixed|NULL
+     */
+    protected function _save(Model $model, $data)
+    {
+        throw new HTTP_Exception_501;
+    }
+
+    public function delete($id)
+    {
+        $model = $this->model( (int) $id );
+
+        return $this->response( $this->_delete($model) );
+    }
+
+    /**
+     * Override this if needed
+     *
+     * @param $model
+     * @throws HTTP_Exception_501
+     * @return bool
+     */
+    protected function _delete(Model $model)
+    {
+        throw new HTTP_Exception_501;
+    }
+
+    /**
+     * Returns new model or performs search by id
+     *
+     * @param null $id
+     * @return Model
+     */
+    abstract protected function model($id = NULL);
+
+    /**
+     * Creates API response from raw data
+     *
      * @param $data
      * @return API_Response
      */
