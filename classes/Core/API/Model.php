@@ -65,7 +65,7 @@ abstract class Core_API_Model {
 
     public function save($data)
     {
-        $id = ( isset($data->id) AND $data->id )
+        $id = ( isset($data->id) AND (int) $data->id )
             ? $data->id
             : NULL;
 
