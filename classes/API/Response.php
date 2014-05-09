@@ -55,7 +55,7 @@ class API_Response {
      */
     public function get_last_modified()
     {
-        return $this->_last_modified;
+        return $this->_last_modified ?: new DateTime;
     }
 
     public function from_array(array $input)

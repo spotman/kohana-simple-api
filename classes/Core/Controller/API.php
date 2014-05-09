@@ -3,13 +3,9 @@
 abstract class Core_Controller_API extends Controller {
 
     /**
-     * @var API_Server
+     * @var API_Server|API_Server_JSONRPC
      */
     protected $_server;
-
-    protected $_server_request_key_to_const = array(
-        'json-rpc'  =>  API_Server::JSON_RPC
-    );
 
     public function before()
     {
@@ -22,18 +18,17 @@ abstract class Core_Controller_API extends Controller {
 
     protected function get_server()
     {
-        $server_key = $this->request->param('server');
+        $server_key = $this->request->param('type');
         $server_type = $this->get_server_type_by_route_key($server_key);
 
-        return API::server($server_type);
+        $server_version = (int) $this->request->param('version');
+
+        return API::server($server_type, $server_version);
     }
 
     protected function get_server_type_by_route_key($key)
     {
-        if ( ! isset($this->_server_request_key_to_const[ $key ]) )
-            throw new API_Exception('Unknown server key: :key', array(':key' =>  $key));
-
-        return $this->_server_request_key_to_const[ $key ];
+        return API_Server::url_key_to_type($key);
     }
 
     public function action_process()

@@ -47,6 +47,11 @@ abstract class API_Proxy {
         return $this;
     }
 
+    /**
+     * @param $method
+     * @param $arguments
+     * @return API_Response
+     */
     final public function __call($method, $arguments)
     {
         $data = $this->call($method, $arguments);
@@ -57,10 +62,17 @@ abstract class API_Proxy {
     /**
      * @param $method
      * @param array $arguments
-     * @return array
+     * @return array Result of the API_Response::as_array()
      */
     abstract protected function call($method, array $arguments);
 
+    /**
+     * @param string $method
+     * @param array $arguments
+     * @return API_Response
+     * @throws API_Proxy_Exception
+     * @throws API_Model_Exception
+     */
     protected function model_call($method, array $arguments)
     {
         $model = $this->model();
@@ -79,17 +91,11 @@ abstract class API_Proxy {
         {
             $result = API::response();
         }
-//        else if ( ! ($result instanceof API_Response) )
-//        {
-//            $result = API::response()->set_data($result);
-//        }
 
         if ( ! ($result instanceof API_Response) )
-            throw new API_Model_Exception(
-                'Api model method must return API_Response objects only'
-            );
+            throw new API_Model_Exception('Api model method must return API_Response objects only');
 
-        return $result->as_array();
+        return $result;
     }
 
     // TODO

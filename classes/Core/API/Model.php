@@ -117,12 +117,12 @@ abstract class Core_API_Model {
     abstract protected function model($id = NULL);
 
     /**
-     * Creates API response from raw data
+     * Creates API response from raw data (or without it)
      *
-     * @param $data
+     * @param mixed|NULL $data
      * @return API_Response
      */
-    protected function response($data)
+    protected function response($data = NULL)
     {
         return API::response()->set_data($data);
     }

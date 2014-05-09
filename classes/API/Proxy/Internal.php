@@ -4,13 +4,14 @@ class API_Proxy_Internal extends API_Proxy {
 
     /**
      * Simple proxy call to model method
+     *
      * @param string $method
      * @param array $arguments
-     * @return mixed
+     * @return array Result of the API_Response::as_array()
      */
     protected function call($method, array $arguments)
     {
-        return $this->model_call($method, $arguments);
+        return $this->model_call($method, $arguments)->as_array();
     }
 
 }

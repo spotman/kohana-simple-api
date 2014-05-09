@@ -2,15 +2,19 @@
 
 class API_Proxy_External extends API_Proxy {
 
+    /**
+     * Performs remote API call
+     *
+     * @param string $method
+     * @param array $arguments
+     * @return array Result of the API_Response::as_array()
+     */
     protected function call($method, array $arguments)
     {
-        // TODO change to API_Client
-        // Getting transport
-        $transport = API::server();
-
+        $client = API::client();
         $resource = $this->model()->name();
 
-        return $transport->remote_procedure_call($resource, $method, $arguments);
+        return $client->remote_procedure_call($resource, $method, $arguments)->as_array();
     }
 
 }

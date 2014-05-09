@@ -3,27 +3,29 @@
 
 abstract class Core_API {
 
-    const VERSION = 1;
-
     /**
-     * API transport factory, shorthand to API_Transport::by_type()
+     * API server factory, shorthand to API_Server::by_type()
+     *
      * @param integer|null $type Transport type constant like API_Transport::JSON_RPC
+     * @param $version
      * @return API_Server|API_Server_JSONRPC
      */
-    public static function server($type = NULL)
+    public static function server($type, $version)
     {
-        if ( $type === NULL )
-        {
-            $type = static::config('server.type', API_Server::JSON_RPC);
-        }
-
+        // TODO Deal with version
         return API_Server::by_type($type);
     }
 
-    // TODO remove
-    public static function is_server_enabled()
+    /**
+     * @return API_Client
+     */
+    public static function client()
     {
-        return (bool) static::config('server.enabled', FALSE);
+        $type       = static::config('client.type');
+        $host       = static::config('client.host');
+        $version    = static::config('client.version');
+
+        return API_Client::by_type($type, $host, $version);
     }
 
     /**
@@ -79,10 +81,18 @@ abstract class Core_API {
     {
         if ( $type === NULL )
         {
-            $type = static::config('proxy', API_Proxy::INTERNAL);
+            $type = static::config('client.proxy', API_Proxy::INTERNAL);
         }
 
         return API_Proxy::by_type($type);
+    }
+
+    /**
+     * @return bool
+     */
+    public static function is_server_enabled()
+    {
+        return (bool) static::config('server.enabled', FALSE);
     }
 
 }
