@@ -16,7 +16,7 @@ JQuery plugin included in static-files/api/jquery.jsonRPC.js
 
 **Predefined model methods** for:
 - getting one item `one`,
-- saving one item `save`,
+- adding/saving one item `save`,
 - deleting one item `delete`
 
 Methods `save` and `delete` provide hooks for security checks.
