@@ -12,7 +12,7 @@ Features
 **Integrated JSON RPC 2.0 server**
 Write up your models and use them immediately!
 Any JSON RPC 2.0 compatible client may use it.
-JQuery plugin included in static-files/api/jquery.jsonRPC.js
+JQuery plugin included in `static-files/api/jquery.jsonRPC.js`
 
 **Predefined model methods** for:
 - getting one item `one`,
