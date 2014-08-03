@@ -66,7 +66,7 @@ abstract class Core_API_Model {
     public function save($data)
     {
         $id = ( isset($data->id) AND (int) $data->id )
-            ? $data->id
+            ? (int) $data->id
             : NULL;
 
         $model = $this->model($id);
