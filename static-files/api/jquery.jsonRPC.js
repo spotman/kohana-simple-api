@@ -42,7 +42,8 @@
     {
         var JSONRPCError = function (obj) {
             jQuery.extend(this, obj);
-            this.toString = function() { return this.message; }
+            this.toString = function() { return this.message; };
+            this.getCode = function() { return this.code; };
         };
 
         // Keep a static counter, so we can give a unique ID to each request.  This technique
