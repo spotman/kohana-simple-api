@@ -27,7 +27,6 @@ class API_Response {
      */
     public function set_data($data)
     {
-        // TODO
         $this->_data = $data;
         return $this;
     }
@@ -87,7 +86,6 @@ class API_Response {
 
         $last_modified = $this->get_last_modified() ?: (new DateTime);
 
-        // TODO
         return array(
             'data'  =>  $data,
             'last_modified'  => $last_modified->getTimestamp(),
@@ -120,6 +118,11 @@ class API_Response {
         }
     }
 
+    /**
+     * @param $object
+     * @returns int|string|array
+     * @throws API_Model_Exception
+     */
     protected function convert_result_object($object)
     {
         if ( $object instanceof API_Response_Item )
