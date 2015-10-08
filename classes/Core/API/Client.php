@@ -37,7 +37,7 @@ abstract class Core_API_Client extends API_Types {
         $this->version = $version;
     }
 
-    protected function get_url()
+    public function get_url()
     {
         $relative_url =  Route::url('api', array(
             'version'   =>  $this->version,
