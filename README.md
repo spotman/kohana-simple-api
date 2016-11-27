@@ -50,7 +50,7 @@ class ORM extends Kohana_ORM implements API_Response_Item {
      *
      * @return DateTime|NULL
      */
-    public function get_last_modified()
+    public function get_api_last_modified()
     {
         // Empty by default
         return NULL;
@@ -135,7 +135,7 @@ $categories_response = API::category()->all();
 
 $categories = $categories_response->get_data();
 
-$categories_last_modified = $categories_response->get_last_modified();
+$categories_last_modified = $categories_response->get_api_last_modified();
 
 ```
 

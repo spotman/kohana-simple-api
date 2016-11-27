@@ -128,7 +128,7 @@ class API_Response {
         if ( $object instanceof API_Response_Item )
         {
             // Get item`s last modified time for setting it in current response
-            $last_modified = $object->get_last_modified();
+            $last_modified = $object->get_api_last_modified();
 
             if ( $last_modified )
             {
