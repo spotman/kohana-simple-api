@@ -22,7 +22,7 @@ JQuery plugin included in `static-files/api/jquery.jsonRPC.js`
 Methods `save` and `delete` provide hooks for security checks.
 
 **Transparent recursive converting of the result's custom objects** in JSON-friendly data structures.
-It automatically `foreach` objects implementing `Traversable`. Other objects must implement `API_Response_Item`.
+It automatically `foreach` objects implementing `Traversable`. Other objects must implement `ApiResponseItemInterface`.
 
 Example: I've created file application/classes/ORM.php
 
@@ -30,8 +30,9 @@ Example: I've created file application/classes/ORM.php
 
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use Spotman\Api\ApiResponseItemInterface;
 
-class ORM extends Kohana_ORM implements API_Response_Item {
+class ORM extends Kohana_ORM implements ApiResponseItemInterface {
 
     /**
      * Default implementation for ORM objects
@@ -39,7 +40,7 @@ class ORM extends Kohana_ORM implements API_Response_Item {
      *
      * @return array
      */
-    public function get_api_response_data()
+    public function getApiResponseData()
     {
         return $this->as_array();
     }
@@ -50,7 +51,7 @@ class ORM extends Kohana_ORM implements API_Response_Item {
      *
      * @return DateTime|NULL
      */
-    public function get_api_last_modified()
+    public function getApiLastModified()
     {
         // Empty by default
         return NULL;
@@ -79,7 +80,7 @@ protected function model($id = NULL)
 
 **Scaling** (has auth and performance issues now)
 - move your API to another web server/instance
-- change `client.proxy` in config to `API_Proxy::EXTERNAL`
+- change `client.proxy` in config to `ApiProxy::EXTERNAL`
 - set `client.host` to URL of the new API server
 - PROFIT!
 
@@ -91,13 +92,14 @@ Installation
 
 2) Create model classes named like API_Model_...
 
-3) Create public methods; each method must return instance of API_Response; you may use API_Model::response() helper
+3) Create public methods; each method must return instance of `ApiModelResponse`; you may use `ApiModel::response()` helper
 
 4) For better code quality and IDE autocomplete I recommend writing some helpers in `application/classes/API.php`
 
 ```php
+namespace App;
 
-class API extends Core_API {
+class API extends Spotman\Api\Api {
 
     /**
      * @return API_Model_Category
@@ -130,12 +132,12 @@ class API extends Core_API {
 
 ```php
 
-// API call returns instance of API_Response
-$categories_response = API::category()->all();
+// API call returns instance of ApiModelResponse
+$categories_response = \App\API::category()->all();
 
-$categories = $categories_response->get_data();
+$categories = $categories_response->getData();
 
-$categories_last_modified = $categories_response->get_api_last_modified();
+$categories_last_modified = $categories_response->getApiLastModified();
 
 ```
 
@@ -155,7 +157,7 @@ TODO:
 
 1. Remove static methods from `API` class and introduce `API::instance($config_key = "default")`
 2. Introduce API versions
-3. Full support of the API_Proxy_External (add auth and remove performance leaks)
+3. Full support of the ApiProxyExternal (add auth and remove performance leaks)
 4. Response caching
 5. ... (your vision would be greatly appreciated)
 

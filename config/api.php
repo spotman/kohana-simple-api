@@ -1,4 +1,8 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+
+use Spotman\Api\ApiProxy;
+use Spotman\Api\ApiProxyInterface;
+use Spotman\Api\ApiTypesHelper;
 
 return array(
 
@@ -14,10 +18,10 @@ return array(
 
         /**
          * How do we connect to API
-         * API_Proxy::INTERNAL - directly call to API_Model_...
-         * API_Proxy::EXTERNAL - through HTTP-request to remote API server
+         * ApiProxy::INTERNAL - directly call to API_Model_...
+         * ApiProxy::EXTERNAL - through HTTP-request to remote API server
          */
-        'proxy'     =>  API_Proxy::INTERNAL,
+        'proxy'     => ApiProxyInterface::INTERNAL,
 
         /**
          * Options for remote API server
@@ -31,7 +35,7 @@ return array(
         /**
          * Server type
          */
-        'type'      =>  API_Server::JSON_RPC,
+        'type'      =>  ApiTypesHelper::JSON_RPC,
 
     ),
 
