@@ -3,9 +3,8 @@ namespace Spotman\Api\Proxy;
 
 use Spotman\Api\API;
 use Spotman\Api\ApiModelResponse;
-use Spotman\Api\ApiProxy;
 
-class ApiProxyExternal extends ApiProxy
+class ApiProxyExternal extends ApiProxyAbstract
 {
     /**
      * Performs remote API call
@@ -18,7 +17,7 @@ class ApiProxyExternal extends ApiProxy
     protected function call($method, array $arguments)
     {
         $client   = API::clientFactory();
-        $resource = $this->getModel()->getName();
+        $resource = $this->model->getName();
 
         return $client->remote_procedure_call($resource, $method, $arguments);
     }

@@ -14,7 +14,7 @@ Write up your models and use them immediately!
 Any JSON RPC 2.0 compatible client may use it.
 JQuery plugin included in `static-files/api/jquery.jsonRPC.js`
 
-**Predefined model methods** for:
+**Predefined model methods** in `ApiModelCrud` for:
 - getting one item `one`,
 - adding/saving one item `save`,
 - deleting one item `delete`
@@ -24,16 +24,15 @@ Methods `save` and `delete` provide hooks for security checks.
 **Transparent recursive converting of the result's custom objects** in JSON-friendly data structures.
 It automatically `foreach` objects implementing `Traversable`. Other objects must implement `ApiResponseItemInterface`.
 
-Example: I've created file application/classes/ORM.php
+Example: I've created file `application/classes/ORM.php`
 
 ```php
-
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 use Spotman\Api\ApiResponseItemInterface;
 
-class ORM extends Kohana_ORM implements ApiResponseItemInterface {
-
+class ORM extends Kohana_ORM implements ApiResponseItemInterface
+{
     /**
      * Default implementation for ORM objects
      * Override this method in child classes
@@ -56,31 +55,34 @@ class ORM extends Kohana_ORM implements ApiResponseItemInterface {
         // Empty by default
         return NULL;
     }
-
 }
-
 ```
 
 So I may use ORM instances in API models like this:
 
 ```php
+<?php
 
-public function all()
+use Spotman\Api\ApiModel;
+
+class API_Model_Category extends ApiModel
 {
-    $categories = $this->model()->find_all();
-    return $this->response($categories);
+  public function all()
+  {
+      $categories = $this->model()->find_all();
+      return $this->response($categories);
+  }
+  
+  protected function model($id = NULL)
+  {
+      return ORM::factory('Category', $id);
+  }
 }
-
-protected function model($id = NULL)
-{
-    return ORM::factory('Category', $id);
-}
-
 ```
 
 **Scaling** (has auth and performance issues now)
 - move your API to another web server/instance
-- change `client.proxy` in config to `ApiProxy::EXTERNAL`
+- change `client.proxy` in config to `ApiProxyInterface::EXTERNAL`
 - set `client.host` to URL of the new API server
 - PROFIT!
 
@@ -92,37 +94,38 @@ Installation
 
 2) Create model classes named like API_Model_...
 
-3) Create public methods; each method must return instance of `ApiModelResponse`; you may use `ApiModel::response()` helper
+3) Create public methods; each method must return instance of `ApiModelResponse`; you may use `ApiModel->response()` helper
 
 4) For better code quality and IDE autocomplete I recommend writing some helpers in `application/classes/API.php`
 
 ```php
-namespace App;
+<?php
+namespace Application;
 
-class API extends Spotman\Api\Api {
+class API extends \Spotman\Api\API {
 
     /**
-     * @return API_Model_Category
+     * @return \API_Model_Category
      */
-    public static function category()
+    public function category()
     {
-        return static::get('Category');
+        return $this->get('Category');
     }
 
     /**
-     * @return API_Model_Subcategory
+     * @return \API_Model_Subcategory
      */
-    public static function subcategory()
+    public function subcategory()
     {
-        return static::get('Subcategory');
+        return $this->get('Subcategory');
     }
 
     /**
-     * @return API_Model_Author
+     * @return \API_Model_Author
      */
-    public static function author()
+    public function author()
     {
-        return static::get('Author');
+        return $this->get('Author');
     }
 }
 
@@ -131,13 +134,20 @@ class API extends Spotman\Api\Api {
 5) Write app code using your helpers
 
 ```php
+<?php
+use Application\API;
+
+// Instantiate your API class via new keyword or via dependency injection
+$api = new API;
 
 // API call returns instance of ApiModelResponse
-$categories_response = \App\API::category()->all();
+$categoriesResponse = $api->category()->all();
 
-$categories = $categories_response->getData();
+// Getting model response data
+$categories = $categoriesResponse->getData();
 
-$categories_last_modified = $categories_response->getApiLastModified();
+// And last modified timestamp (if set)
+$categoriesLastModified = $categoriesResponse->getApiLastModified();
 
 ```
 
@@ -150,12 +160,12 @@ NOTICE
 **This module is in beta version so everything may be changed later.**
 
 Currently API do not provide auth implementation (I'm searching for a better way).
-But in `internal` mode model's code is executed in context of your app, so you may use `Auth::instance()->get_user()` or similar.
+But in `internal` mode API models methods are executed in context of your app, so you may use `Auth::instance()->get_user()` to get current user or to get other current application state if needed.
 
 TODO:
 -----
 
-1. Remove static methods from `API` class and introduce `API::instance($config_key = "default")`
+1. ~~Remove static methods from API class~~ Done!
 2. Introduce API versions
 3. Full support of the ApiProxyExternal (add auth and remove performance leaks)
 4. Response caching

@@ -1,5 +1,4 @@
 <?php
-
 namespace Spotman\Api;
 
 use Arr;
@@ -9,24 +8,6 @@ class API
 {
     // TODO ApiFactory getting config and all needed dependencies
     // TODO constructor with all dependencies (proxy)
-
-    /**
-     * API server factory, shorthand to API_Server::by_type()
-     *
-     * @deprecated
-     *
-     * @param integer|null $type Transport type constant like ApiTypesHelper::JSON_RPC
-     * @param              $version
-     *
-     * @return \Spotman\Api\ApiServerInterface
-     */
-    public static function serverFactory($type, $version)
-    {
-        // TODO DI
-        $factory = new ApiServerFactory;
-
-        return $factory->createApiServerByType($type, $version);
-    }
 
     /**
      * @deprecated
@@ -41,6 +22,34 @@ class API
         $factory = new ApiClientFactory;
 
         return $factory->createApiClientByType($type, $host, $version);
+    }
+
+    /**
+     * API server factory
+     *
+     * @param integer|null $type Transport type constant like ApiTypesHelper::JSON_RPC
+     * @param              $version
+     *
+     * @return \Spotman\Api\ApiServerInterface
+     */
+    public function serverFactory($type, $version)
+    {
+        if (!$this->isServerEnabled()) {
+            throw new ApiException('API server is not enabled');
+        }
+
+        // TODO DI
+        $factory = new ApiServerFactory;
+
+        return $factory->createApiServerByType($type, $version);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isServerEnabled()
+    {
+        return (bool)static::config('server.enabled', false);
     }
 
     /**
@@ -62,36 +71,28 @@ class API
     }
 
     /**
-     * @return bool
-     */
-    public static function isServerEnabled()
-    {
-        return (bool)static::config('server.enabled', false);
-    }
-
-    /**
      * @param string   $name API Model name
-     * @param int|null $proxy_type Const ApiProxy::INTERNAL or ApiProxy::EXTERNAL
+     * @param int|null $proxyType Const ApiProxyInterface::INTERNAL or ApiProxyInterface::EXTERNAL
      *
-     * @return ApiProxy
+     * @return \Spotman\Api\ApiProxyInterface
      */
-    public function get($name, $proxy_type = null)
+    public function get($name, $proxyType = null)
     {
-        $model = static::model($name);
-        $proxy = static::proxyFactory($proxy_type);
+        if ($proxyType === null) {
+            $proxyType = (int)static::config('client.proxy', ApiProxyInterface::INTERNAL);
+        }
 
-        $proxy->setModel($model);
+        $model = $this->modelFactory($name);
 
-        return $proxy;
+        return $this->proxyFactory($proxyType, $model);
     }
 
     /**
-     * @param $name
+     * @param string $name
      *
-     * @deprecated
      * @return \Spotman\Api\ApiModelInterface
      */
-    protected static function model($name)
+    protected function modelFactory($name)
     {
         $factory = new ApiModelFactory();
 
@@ -101,19 +102,15 @@ class API
     /**
      * API Proxy factory
      *
-     * @param int|null $type Const API_Proxy::INTERNAL or API_Proxy::EXTERNAL
+     * @param int                            $type Const API_Proxy::INTERNAL or API_Proxy::EXTERNAL
+     * @param \Spotman\Api\ApiModelInterface $model
      *
-     * @deprecated
-     * @return ApiProxy
+     * @return \Spotman\Api\ApiProxyInterface
      */
-    protected static function proxyFactory($type = null)
+    protected function proxyFactory($type, ApiModelInterface $model)
     {
-        if ($type === null) {
-            $type = (int)static::config('client.proxy', ApiProxyInterface::INTERNAL);
-        }
-
         $factory = new ApiProxyFactory;
 
-        return $factory->createApiProxyByType($type);
+        return $factory->createApiProxyByType($type, $model);
     }
 }

@@ -1,27 +1,26 @@
 <?php
 
-use Spotman\Api\ApiProxy;
 use Spotman\Api\ApiProxyInterface;
 use Spotman\Api\ApiTypesHelper;
 
-return array(
+return [
 
     /**
      * Defining API client
      */
-    'client'        =>  array(
+    'client' => [
 
         /**
          * What version of the API we use
          */
-        'version'   =>  1,
+        'version' => 1,
 
         /**
          * How do we connect to API
-         * ApiProxy::INTERNAL - directly call to API_Model_...
-         * ApiProxy::EXTERNAL - through HTTP-request to remote API server
+         * ApiProxyInterface::INTERNAL - directly call to API_Model_...
+         * ApiProxyInterface::EXTERNAL - through HTTP-request to remote API server
          */
-        'proxy'     => ApiProxyInterface::INTERNAL,
+        'proxy'   => ApiProxyInterface::INTERNAL,
 
         /**
          * Options for remote API server
@@ -30,23 +29,23 @@ return array(
         /**
          * Hostname of the API server
          */
-        'host'      =>  'api.example.com',
+        'host'    => 'api.example.com',
 
         /**
          * Server type
          */
-        'type'      =>  ApiTypesHelper::JSON_RPC,
+        'type'    => ApiTypesHelper::JSON_RPC,
 
-    ),
+    ],
 
     /**
      * Defining API server
      */
-    'server'    => array(
+    'server' => [
 
         /**
          * If TRUE then API server is working
          */
-        'enabled'   =>  TRUE,
-    ),
-);
+        'enabled' => true,
+    ],
+];

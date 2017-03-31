@@ -1,10 +1,9 @@
 <?php
 namespace Spotman\Api\Proxy;
 
-use Spotman\Api\ApiProxy;
 use Spotman\Api\ApiModelResponse;
 
-class ApiProxyInternal extends ApiProxy
+class ApiProxyInternal extends ApiProxyAbstract
 {
     /**
      * Simple proxy call to model method

@@ -1,30 +1,28 @@
 <?php
-namespace Spotman\Api;
+namespace Spotman\Api\Proxy;
 
 use ReflectionMethod;
+use Spotman\Api\ApiModelException;
+use Spotman\Api\ApiModelInterface;
+use Spotman\Api\ApiModelResponse;
+use Spotman\Api\ApiProxyException;
+use Spotman\Api\ApiProxyInterface;
 
-abstract class ApiProxy implements ApiProxyInterface
+abstract class ApiProxyAbstract implements ApiProxyInterface
 {
-    protected $_model;
-
     /**
-     * @return \Spotman\Api\ApiModelInterface
+     * @var \Spotman\Api\ApiModelInterface
      */
-    public function getModel()
-    {
-        return $this->_model;
-    }
+    protected $model;
 
     /**
-     * @param \Spotman\Api\ApiModelInterface $model
+     * ApiProxyAbstract constructor.
      *
-     * @deprecated Move this into constructor and modify in factory
-     * @return $this
+     * @param \Spotman\Api\ApiModelInterface $model
      */
-    public function setModel(ApiModelInterface $model)
+    public function __construct(ApiModelInterface $model)
     {
-        $this->_model = $model;
-        return $this;
+        $this->model = $model;
     }
 
     /**
@@ -60,7 +58,7 @@ abstract class ApiProxy implements ApiProxyInterface
      */
     protected function callModelMethod($method, array $arguments)
     {
-        $model = $this->getModel();
+        $model = $this->model;
 
         if (!is_callable([$model, $method])) {
             throw new ApiProxyException('Unknown method :method in proxy object :class',
@@ -78,14 +76,16 @@ abstract class ApiProxy implements ApiProxyInterface
         }
 
         if (!($result instanceof ApiModelResponse)) {
-            throw new ApiModelException('Api model method must return ApiModelResponse objects only');
+            throw new ApiModelException('Api model method may return objects which are instances of :interface only', [
+                ':interface' => ApiModelResponse::class,
+            ]);
         }
 
         return $result;
     }
 
     // TODO
-    protected function get_named_method_args($class, $method, array $runtime_arguments = NULL)
+    protected function get_named_method_args($class, $method, array $runtime_arguments = null)
     {
         $reflector  = new ReflectionMethod($class, $method);
         $parameters = $reflector->getParameters();

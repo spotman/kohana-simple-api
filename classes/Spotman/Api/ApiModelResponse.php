@@ -4,7 +4,7 @@ namespace Spotman\Api;
 use DateTime;
 use Traversable;
 
-class ApiModelResponse
+class ApiModelResponse implements \JSONRPC_ModelResponseInterface
 {
     protected $data;
 
@@ -107,6 +107,22 @@ class ApiModelResponse
             'data'          => $this->getData(),
             'last_modified' => $lastModified->getTimestamp(),
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJsonRpcResponseData()
+    {
+        return $this->getData();
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getJsonRpcResponseLastModified()
+    {
+        return $this->getLastModified();
     }
 
     protected function processLastModified(DateTime $newLastModified)

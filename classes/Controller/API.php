@@ -8,22 +8,14 @@ class Controller_API extends Controller
 {
     public function action_process()
     {
-        $this->getServer()->process(, $this->request, $this->response);
-    }
-
-    protected function getServer()
-    {
-        if (!API::isServerEnabled()) {
-            throw new HTTP_Exception_501('API is not implemented');
-        }
-
         $serverKey = $this->request->param('type');
         $serverType = ApiTypesHelper::urlKeyToType($serverKey);
 
         $serverVersion = (int) $this->request->param('version');
 
-        $factory = new ApiServerFactory;
+        $api = new API;
+        $server = $api->serverFactory($serverType, $serverVersion);
 
-        return $factory->createApiServerByType($serverType, $serverVersion);
+        $server->process($this->request, $this->response);
     }
 }

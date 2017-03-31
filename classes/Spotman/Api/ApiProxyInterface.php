@@ -3,21 +3,8 @@ namespace Spotman\Api;
 
 interface ApiProxyInterface
 {
-    const EXTERNAL = 2;
     const INTERNAL = 1;
-
-    /**
-     * @return \Spotman\Api\ApiModelInterface
-     */
-    public function getModel();
-
-    /**
-     * @param \Spotman\Api\ApiModelInterface $model
-     *
-     * @deprecated Move this into constructor and modify in factory
-     * @return $this
-     */
-    public function setModel(ApiModelInterface $model);
+    const EXTERNAL = 2;
 
     /**
      * @param string $method

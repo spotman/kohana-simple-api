@@ -11,30 +11,10 @@ class ApiProxyFactory
         ApiProxyInterface::EXTERNAL => 'External',
     ];
 
-    public function createApiProxyByName($name)
-    {
-        $className = '\\Spotman\\Api\\Proxy\\ApiProxy'.$name;
-
-        if (!class_exists($className)) {
-            throw new ApiException('Can not find API proxy for :name', [':name' => $name]);
-        }
-
-        $server = new $className;
-
-        if (!($server instanceof ApiProxyInterface)) {
-            throw new ApiException('Class :class must implement :interface', [
-                ':class'    =>  get_class($server),
-                ':interface' =>  ApiProxyInterface::class,
-            ]);
-        }
-
-        return $server;
-    }
-
-    public function createApiProxyByType($type)
+    public function createApiProxyByType($type, ApiModelInterface $model)
     {
         $name = $this->getNameFromType($type);
-        return $this->createApiProxyByName($name);
+        return $this->createApiProxyByName($name, $model);
     }
 
     protected function getNameFromType($type)
@@ -44,5 +24,32 @@ class ApiProxyFactory
         }
 
         return $this->typeToName[$type];
+    }
+
+    /**
+     * @param string                         $name
+     * @param \Spotman\Api\ApiModelInterface $model
+     *
+     * @return \Spotman\Api\ApiProxyInterface
+     * @throws \Spotman\Api\ApiException
+     */
+    public function createApiProxyByName($name, ApiModelInterface $model)
+    {
+        $className = '\\Spotman\\Api\\Proxy\\ApiProxy' . $name;
+
+        if (!class_exists($className)) {
+            throw new ApiException('Can not find API proxy for :name', [':name' => $name]);
+        }
+
+        $server = new $className($model);
+
+        if (!($server instanceof ApiProxyInterface)) {
+            throw new ApiException('Class :class must implement :interface', [
+                ':class'     => get_class($server),
+                ':interface' => ApiProxyInterface::class,
+            ]);
+        }
+
+        return $server;
     }
 }
