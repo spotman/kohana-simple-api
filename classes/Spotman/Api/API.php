@@ -6,8 +6,29 @@ use Kohana;
 
 class API
 {
+    /**
+     * @var \Spotman\Api\ApiResourceProxyFactory
+     */
+    protected $proxyFactory;
+
+    /**
+     * @var \Spotman\Api\ApiServerFactory
+     */
+    protected $serverFactory;
+
+    /**
+     * API constructor.
+     *
+     * @param \Spotman\Api\ApiResourceProxyFactory $proxyFactory
+     * @param \Spotman\Api\ApiServerFactory        $serverFactory
+     */
+    public function __construct(ApiResourceProxyFactory $proxyFactory, ApiServerFactory $serverFactory)
+    {
+        $this->proxyFactory  = $proxyFactory;
+        $this->serverFactory = $serverFactory;
+    }
+
     // TODO ApiFactory getting config and all needed dependencies
-    // TODO constructor with all dependencies (proxy)
 
     /**
      * @deprecated
@@ -19,37 +40,10 @@ class API
         $host    = static::config('client.host');
         $version = static::config('client.version');
 
+        // TODO DI
         $factory = new ApiClientFactory;
 
         return $factory->createApiClientByType($type, $host, $version);
-    }
-
-    /**
-     * API server factory
-     *
-     * @param integer|null $type Transport type constant like ApiTypesHelper::JSON_RPC
-     * @param              $version
-     *
-     * @return \Spotman\Api\ApiServerInterface
-     */
-    public function serverFactory($type, $version)
-    {
-        if (!$this->isServerEnabled()) {
-            throw new ApiException('API server is not enabled');
-        }
-
-        // TODO DI
-        $factory = new ApiServerFactory;
-
-        return $factory->createApiServerByType($type, $version);
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isServerEnabled()
-    {
-        return (bool)static::config('server.enabled', false);
     }
 
     /**
@@ -70,47 +64,87 @@ class API
         return Arr::path($config, $key, $default_value);
     }
 
-    /**
-     * @param string   $name API Model name
-     * @param int|null $proxyType Const ApiProxyInterface::INTERNAL or ApiProxyInterface::EXTERNAL
-     *
-     * @return \Spotman\Api\ApiProxyInterface
-     */
-    public function get($name, $proxyType = null)
+    public static function prepareNamedArguments($classNameOrObject, $methodName, array $requestArguments)
     {
-        if ($proxyType === null) {
-            $proxyType = (int)static::config('client.proxy', ApiProxyInterface::INTERNAL);
+        // Skip calls without arguments
+        if (!$requestArguments) {
+            return $requestArguments;
         }
 
-        $model = $this->modelFactory($name);
+        // Using named arguments already, skip processing
+        if (is_string(key($requestArguments))) {
+            return $requestArguments;
+        }
 
-        return $this->proxyFactory($proxyType, $model);
+        $namedArguments = [];
+
+        // TODO deal with missed/unordered arguments
+
+        $reflection = new \ReflectionClass($classNameOrObject);
+        $parameters = $reflection->getMethod($methodName)->getParameters();
+
+        foreach ($parameters as $param) {
+            $position = $param->getPosition();
+
+            if (isset($requestArguments[$position])) {
+                $key                  = $param->getName();
+                $namedArguments[$key] = $requestArguments[$position];
+            }
+        }
+
+        return $namedArguments;
     }
 
     /**
-     * @param string $name
+     * API server factory
      *
-     * @return \Spotman\Api\ApiModelInterface
+     * @param integer|null $type Transport type constant like ApiTypesHelper::JSON_RPC
+     * @param              $version
+     *
+     * @return \Spotman\Api\ApiServerInterface
      */
-    protected function modelFactory($name)
+    public function createServer($type, $version)
     {
-        $factory = new ApiModelFactory();
+        if (!$this->isServerEnabled()) {
+            throw new ApiException('API server is not enabled');
+        }
 
-        return $factory->create($name);
+        return $this->serverFactory->createApiServerByType($type, $version);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isServerEnabled()
+    {
+        return (bool)static::config('server.enabled', false);
+    }
+
+    /**
+     * @param string   $resourceName API Model name
+     * @param int|null $proxyType Const ApiResourceProxyInterface::INTERNAL or ApiResourceProxyInterface::EXTERNAL
+     *
+     * @return \Spotman\Api\ApiResourceProxyInterface
+     */
+    public function get($resourceName, $proxyType = null)
+    {
+        if ($proxyType === null) {
+            $proxyType = (int)static::config('client.proxy', ApiResourceProxyInterface::INTERNAL);
+        }
+
+        return $this->createResourceProxy($proxyType, $resourceName);
     }
 
     /**
      * API Proxy factory
      *
-     * @param int                            $type Const API_Proxy::INTERNAL or API_Proxy::EXTERNAL
-     * @param \Spotman\Api\ApiModelInterface $model
+     * @param int    $type Const API_Proxy::INTERNAL or API_Proxy::EXTERNAL
+     * @param string $resourceName
      *
-     * @return \Spotman\Api\ApiProxyInterface
+     * @return \Spotman\Api\ApiResourceProxyInterface
      */
-    protected function proxyFactory($type, ApiModelInterface $model)
+    protected function createResourceProxy($type, $resourceName)
     {
-        $factory = new ApiProxyFactory;
-
-        return $factory->createApiProxyByType($type, $model);
+        return $this->proxyFactory->createFromType($type, $resourceName);
     }
 }

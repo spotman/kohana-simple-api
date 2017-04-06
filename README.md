@@ -14,7 +14,7 @@ Write up your models and use them immediately!
 Any JSON RPC 2.0 compatible client may use it.
 JQuery plugin included in `static-files/api/jquery.jsonRPC.js`
 
-**Predefined model methods** in `ApiModelCrud` for:
+**Predefined model methods** in `ModelCrudApiResource` for:
 - getting one item `one`,
 - adding/saving one item `save`,
 - deleting one item `delete`
@@ -82,7 +82,7 @@ class API_Model_Category extends ApiModel
 
 **Scaling** (has auth and performance issues now)
 - move your API to another web server/instance
-- change `client.proxy` in config to `ApiProxyInterface::EXTERNAL`
+- change `client.proxy` in config to `ApiResourceProxyInterface::EXTERNAL`
 - set `client.host` to URL of the new API server
 - PROFIT!
 
@@ -94,7 +94,7 @@ Installation
 
 2) Create model classes named like API_Model_...
 
-3) Create public methods; each method must return instance of `ApiModelResponse`; you may use `ApiModel->response()` helper
+3) Create public methods; each method must return instance of `ApiMethodResponse`; you may use `ApiModel->response()` helper
 
 4) For better code quality and IDE autocomplete I recommend writing some helpers in `application/classes/API.php`
 
@@ -140,7 +140,7 @@ use Application\API;
 // Instantiate your API class via new keyword or via dependency injection
 $api = new API;
 
-// API call returns instance of ApiModelResponse
+// API call returns instance of ApiMethodResponse
 $categoriesResponse = $api->category()->all();
 
 // Getting model response data
@@ -167,7 +167,7 @@ TODO:
 
 1. ~~Remove static methods from API class~~ Done!
 2. Introduce API versions
-3. Full support of the ApiProxyExternal (add auth and remove performance leaks)
+3. Full support of the ExternalApiResourceProxy (add auth and remove performance leaks)
 4. Response caching
 5. ... (your vision would be greatly appreciated)
 

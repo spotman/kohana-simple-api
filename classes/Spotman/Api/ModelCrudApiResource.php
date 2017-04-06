@@ -1,7 +1,12 @@
 <?php
 namespace Spotman\Api;
 
-abstract class ApiModelCrud extends ApiModel
+/**
+ * Class ModelCrudApiResource
+ * @package Spotman\Api
+ * @deprecated Use ApiMethods instead
+ */
+abstract class ModelCrudApiResource extends ApiModel
 {
     public function one($id)
     {
@@ -13,7 +18,7 @@ abstract class ApiModelCrud extends ApiModel
      *
      * @param $id
      *
-     * @return \Spotman\Api\ApiCrudModelProxyInterface
+     * @return \Spotman\Api\AbstractCrudMethodsModelInterface
      */
     protected function _one($id)
     {
@@ -39,12 +44,12 @@ abstract class ApiModelCrud extends ApiModel
      * @param $model
      * @param $data
      *
-     * @throws \Spotman\Api\ApiModelException
-     * @return \Spotman\Api\ApiCrudModelProxyInterface|null
+     * @throws \Spotman\Api\ApiMethodException
+     * @return \Spotman\Api\AbstractCrudMethodsModelInterface|null
      */
     protected function _save($model, $data)
     {
-        throw new ApiModelException('Not implemented');
+        throw new ApiMethodException('Not implemented');
     }
 
     public function delete($id)
@@ -57,14 +62,14 @@ abstract class ApiModelCrud extends ApiModel
     /**
      * Override this if needed
      *
-     * @param \Spotman\Api\ApiCrudModelProxyInterface $model
+     * @param \Spotman\Api\AbstractCrudMethodsModelInterface $model
      *
-     * @throws \Spotman\Api\ApiModelException
+     * @throws \Spotman\Api\ApiMethodException
      * @return bool
      */
     protected function _delete($model)
     {
-        throw new ApiModelException('Not implemented');
+        throw new ApiMethodException('Not implemented');
     }
 
     /**
@@ -72,7 +77,7 @@ abstract class ApiModelCrud extends ApiModel
      *
      * @param int|null $id
      *
-     * @return \Spotman\Api\ApiCrudModelProxyInterface
+     * @return \Spotman\Api\AbstractCrudMethodsModelInterface
      */
     abstract protected function model($id = NULL);
 }

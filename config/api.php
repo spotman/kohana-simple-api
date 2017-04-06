@@ -1,6 +1,6 @@
 <?php
 
-use Spotman\Api\ApiProxyInterface;
+use Spotman\Api\ApiResourceProxyInterface;
 use Spotman\Api\ApiTypesHelper;
 
 return [
@@ -17,10 +17,10 @@ return [
 
         /**
          * How do we connect to API
-         * ApiProxyInterface::INTERNAL - directly call to API_Model_...
-         * ApiProxyInterface::EXTERNAL - through HTTP-request to remote API server
+         * ApiResourceProxyInterface::INTERNAL - directly call to API_Model_...
+         * ApiResourceProxyInterface::EXTERNAL - through HTTP-request to remote API server
          */
-        'proxy'   => ApiProxyInterface::INTERNAL,
+        'proxy'   => ApiResourceProxyInterface::INTERNAL,
 
         /**
          * Options for remote API server

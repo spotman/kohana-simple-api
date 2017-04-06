@@ -4,7 +4,7 @@ namespace Spotman\Api;
 use DateTime;
 use Traversable;
 
-class ApiModelResponse implements \JSONRPC_ModelResponseInterface
+class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
 {
     protected $data;
 
@@ -21,6 +21,12 @@ class ApiModelResponse implements \JSONRPC_ModelResponseInterface
         'double',
     ];
 
+    /**
+     * @param null           $data
+     * @param \DateTime|null $lastModified
+     *
+     * @return \Spotman\Api\ApiMethodResponse
+     */
     public static function factory($data = NULL, DateTime $lastModified = NULL)
     {
         $obj = new static;
@@ -37,7 +43,7 @@ class ApiModelResponse implements \JSONRPC_ModelResponseInterface
     /**
      * @param mixed $data
      *
-     * @return \Spotman\Api\ApiModelResponse
+     * @return \Spotman\Api\ApiMethodResponse
      */
     public function setData($data)
     {
@@ -149,7 +155,7 @@ class ApiModelResponse implements \JSONRPC_ModelResponseInterface
      * @param $object
      *
      * @returns int|string|array
-     * @throws ApiModelException
+     * @throws ApiMethodException
      */
     protected function convertResultObject($object)
     {
@@ -168,7 +174,7 @@ class ApiModelResponse implements \JSONRPC_ModelResponseInterface
             return $this->convertResultTraversable($object);
         }
 
-        throw new ApiModelException(
+        throw new ApiMethodException(
             'API model method may return objects implementing Traversable or ApiModelResponseItemInterface only'
         );
     }
@@ -194,7 +200,7 @@ class ApiModelResponse implements \JSONRPC_ModelResponseInterface
         $type = gettype($data);
 
         if (!in_array(strtolower($type), static::$allowedResultTypes, TRUE)) {
-            throw new ApiModelException('API model must not return values of type :type', [':type' => $type]);
+            throw new ApiMethodException('API model must not return values of type :type', [':type' => $type]);
         }
 
         return $data;
