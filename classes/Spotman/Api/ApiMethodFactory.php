@@ -20,7 +20,7 @@ class ApiMethodFactory
         $this->factory = $factory
             ->setClassSuffix(ApiMethodInterface::SUFFIX)
             ->setExpectedInterface(ApiMethodInterface::class)
-            ->prepareArguments(function ($arguments, $className) {
+            ->prepareArgumentsWith(function ($arguments, $className) {
                 return API::prepareNamedArguments($className, '__construct', $arguments);
             });
     }
