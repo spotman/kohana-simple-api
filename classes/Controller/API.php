@@ -23,6 +23,6 @@ class Controller_API extends Controller
      */
     protected function getContainer()
     {
-        return \BetaKiller\DI\Container::instance();
+        return \BetaKiller\DI\Container::getInstance();
     }
 }
