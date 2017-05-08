@@ -2,7 +2,7 @@
 namespace Spotman\Api\AccessResolver;
 
 use Spotman\Acl\Acl;
-use Spotman\Acl\Resolver\AccessResolverInterface;
+use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodInterface;
@@ -17,17 +17,17 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
     protected $acl;
 
     /**
-     * @var AccessResolverInterface
+     * @var AclAccessResolverInterface
      */
     protected $resolver;
 
     /**
      * AclApiMethodAccessResolver constructor.
      *
-     * @param \Spotman\Acl\Acl $acl
-     * @param \Spotman\Acl\Resolver\AccessResolverInterface $resolver
+     * @param \Spotman\Acl\Acl                                       $acl
+     * @param \Spotman\Acl\AccessResolver\AclAccessResolverInterface $resolver
      */
-    public function __construct(Acl $acl, AccessResolverInterface $resolver)
+    public function __construct(Acl $acl, AclAccessResolverInterface $resolver)
     {
         $this->acl = $acl;
         $this->resolver = $resolver;
