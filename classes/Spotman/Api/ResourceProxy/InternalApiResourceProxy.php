@@ -93,10 +93,11 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
 
     protected function callMethodsCollectionMethod(ApiMethodsCollectionInterface $collection, $methodName, array $arguments)
     {
+        // Creating method instance
         $methodInstance = $this->methodFactory->createMethod($collection->getName(), $methodName, $arguments);
 
-        $accessResolverName = $methodInstance->getAccessResolverName();
-        $resolverInstance   = $this->accessResolverFactory->create($accessResolverName);
+        // Getting method access resolver
+        $resolverInstance = $this->accessResolverFactory->createFromApiMethod($methodInstance);
 
         // Security check
         if (!$resolverInstance->isMethodAllowed($methodInstance)) {

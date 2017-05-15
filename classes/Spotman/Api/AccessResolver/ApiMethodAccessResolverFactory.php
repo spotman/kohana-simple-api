@@ -2,18 +2,30 @@
 namespace Spotman\Api\AccessResolver;
 
 use BetaKiller\Factory\NamespaceBasedFactory;
+use Spotman\Api\ApiMethodInterface;
 
 class ApiMethodAccessResolverFactory
 {
-    protected $factory;
+    /**
+     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     */
+    private $factory;
+
+    /**
+     * @var \Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface
+     */
+    private $accessResolverDetector;
 
     /**
      * ApiResourceFactory constructor.
      *
-     * @param NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactory                            $factory
+     * @param \Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface $detector
      */
-    public function __construct(NamespaceBasedFactory $factory)
+    public function __construct(NamespaceBasedFactory $factory, ApiMethodAccessResolverDetectorInterface $detector)
     {
+        $this->accessResolverDetector = $detector;
+
         $this->factory = $factory
             ->cacheInstances()
             ->addRootNamespace('Spotman')
@@ -23,12 +35,25 @@ class ApiMethodAccessResolverFactory
     }
 
     /**
+     * @param \Spotman\Api\ApiMethodInterface $method
+     *
+     * @return \Spotman\Api\AccessResolver\ApiMethodAccessResolverInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function createFromApiMethod(ApiMethodInterface $method)
+    {
+        $name = $this->accessResolverDetector->detect($method);
+
+        return $this->create($name);
+    }
+
+    /**
      * @param string $name
      *
      * @return \Spotman\Api\AccessResolver\ApiMethodAccessResolverInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function create($name)
+    private function create($name)
     {
         return $this->factory->create($name);
     }
