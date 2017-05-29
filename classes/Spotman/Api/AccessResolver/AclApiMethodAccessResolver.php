@@ -1,8 +1,7 @@
 <?php
 namespace Spotman\Api\AccessResolver;
 
-use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
-use Spotman\Acl\Acl;
+use Spotman\Acl\AclInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodInterface;
@@ -12,25 +11,18 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
     const CODENAME = 'Acl';
 
     /**
-     * @var \Spotman\Acl\Acl
+     * @var \Spotman\Acl\AclInterface
      */
     protected $acl;
 
     /**
-     * @var AclAccessResolverInterface
-     */
-    protected $resolver;
-
-    /**
      * AclApiMethodAccessResolver constructor.
      *
-     * @param \Spotman\Acl\Acl                                       $acl
-     * @param \Spotman\Acl\AccessResolver\AclAccessResolverInterface $resolver
+     * @param \Spotman\Acl\AclInterface $acl
      */
-    public function __construct(Acl $acl, AclAccessResolverInterface $resolver)
+    public function __construct(AclInterface $acl)
     {
-        $this->acl      = $acl;
-        $this->resolver = $resolver;
+        $this->acl = $acl;
     }
 
     /**
@@ -60,8 +52,6 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
                 ':interface' => ResolvingResourceInterface::class,
             ]);
         }
-
-        $resource->useResolver($this->resolver);
 
         return $resource;
     }
