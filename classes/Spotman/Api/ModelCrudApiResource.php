@@ -18,7 +18,7 @@ abstract class ModelCrudApiResource extends ApiModel
      *
      * @param $id
      *
-     * @return \Spotman\Api\AbstractCrudMethodsModelInterface
+     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function _one($id)
     {
@@ -45,7 +45,7 @@ abstract class ModelCrudApiResource extends ApiModel
      * @param $data
      *
      * @throws \Spotman\Api\ApiMethodException
-     * @return \Spotman\Api\AbstractCrudMethodsModelInterface|null
+     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface|null
      */
     protected function _save($model, $data)
     {
@@ -62,7 +62,7 @@ abstract class ModelCrudApiResource extends ApiModel
     /**
      * Override this if needed
      *
-     * @param \Spotman\Api\AbstractCrudMethodsModelInterface $model
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $model
      *
      * @throws \Spotman\Api\ApiMethodException
      * @return bool
@@ -77,7 +77,7 @@ abstract class ModelCrudApiResource extends ApiModel
      *
      * @param int|null $id
      *
-     * @return \Spotman\Api\AbstractCrudMethodsModelInterface
+     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     abstract protected function model($id = NULL);
 }
