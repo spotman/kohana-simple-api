@@ -50,7 +50,7 @@ class API
      * @param string $key
      * @param null   $default_value
      *
-     * @deprecated Use BetaKiller\ConfigInterface + DI instead
+     * @deprecated Use BetaKiller\ConfigProviderInterface + DI instead
      * @return string|int
      */
     protected static function config($key, $default_value = null)
