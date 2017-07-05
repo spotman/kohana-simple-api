@@ -9,7 +9,7 @@ interface ApiResponseItemInterface
     public function getApiResponseData();
 
     /**
-     * @return \DateTime|NULL
+     * @return \DateTimeImmutable|null
      */
-    public function getApiLastModified();
+    public function getApiLastModified(): ?\DateTimeImmutable;
 }

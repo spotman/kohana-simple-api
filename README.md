@@ -48,9 +48,9 @@ class ORM extends Kohana_ORM implements ApiResponseItemInterface
      * Default implementation for ORM objects
      * Override this method in child classes
      *
-     * @return DateTime|NULL
+     * @return \DateTimeImmutable|null
      */
-    public function getApiLastModified()
+    public function getApiLastModified(): ?DateTimeImmutable
     {
         // Empty by default
         return NULL;
