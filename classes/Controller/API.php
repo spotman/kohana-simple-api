@@ -6,6 +6,7 @@ use Spotman\Api\ApiTypesHelper;
 class Controller_API extends Controller
 {
     /**
+     * @Inject
      * @var API
      */
     private $api;
