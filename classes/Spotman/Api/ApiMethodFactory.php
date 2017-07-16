@@ -31,8 +31,9 @@ class ApiMethodFactory
      * @param array  $arguments
      *
      * @return ApiMethodInterface
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createMethod($collectionName, $methodName, array $arguments)
+    public function createMethod($collectionName, $methodName, array $arguments): ApiMethodInterface
     {
         $this->factory->setClassPrefixes('Api', 'Method', ucfirst($collectionName));
 

@@ -21,7 +21,7 @@ abstract class AbstractApiMethod implements ApiMethodInterface
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         if (!$this->methodName) {
             $this->parseClassName();
@@ -30,7 +30,7 @@ abstract class AbstractApiMethod implements ApiMethodInterface
         return $this->methodName;
     }
 
-    private function parseClassName()
+    private function parseClassName(): void
     {
         $className = static::class;
         $parts     = explode('\\', $className);
@@ -48,7 +48,7 @@ abstract class AbstractApiMethod implements ApiMethodInterface
     /**
      * @return string
      */
-    public function getCollectionName()
+    public function getCollectionName(): string
     {
         if (!$this->collectionName) {
             $this->parseClassName();
@@ -60,7 +60,7 @@ abstract class AbstractApiMethod implements ApiMethodInterface
     /**
      * @return string
      */
-    public function getAccessResolverName()
+    public function getAccessResolverName(): string
     {
         return AclApiMethodAccessResolver::CODENAME;
     }
@@ -70,7 +70,7 @@ abstract class AbstractApiMethod implements ApiMethodInterface
      *
      * @return \Spotman\Api\ApiMethodResponse
      */
-    protected function response($data = null)
+    protected function response($data = null): ?ApiMethodResponse
     {
         return ApiMethodResponse::factory($data);
     }

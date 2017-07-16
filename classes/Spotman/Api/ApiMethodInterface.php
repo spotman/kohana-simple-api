@@ -8,20 +8,20 @@ interface ApiMethodInterface
     /**
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * @return string
      */
-    public function getCollectionName();
+    public function getCollectionName(): string;
 
     /**
      * @return string
      */
-    public function getAccessResolverName();
+    public function getAccessResolverName(): string;
 
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
      */
-    public function execute();
+    public function execute(): ?ApiMethodResponse;
 }

@@ -3,7 +3,7 @@ namespace Spotman\Api;
 
 abstract class ApiResource implements ApiResourceInterface
 {
-    public function getName()
+    public function getName(): string
     {
         $className = static::class;
         $pos       = strrpos($className, '\\');
@@ -19,7 +19,7 @@ abstract class ApiResource implements ApiResourceInterface
      *
      * @return ApiMethodResponse
      */
-    protected function response($data = null)
+    protected function response($data = null): ApiMethodResponse
     {
         return ApiMethodResponse::factory($data);
     }
