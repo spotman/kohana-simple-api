@@ -4,26 +4,27 @@ namespace Spotman\Api;
 class ApiServerFactory
 {
     /**
-     * @param int $type
+     * @param int      $type
      * @param int|null $version
      *
      * @return \Spotman\Api\ApiServerInterface
      * @throws \Spotman\Api\ApiException
      */
-    public function createApiServerByType($type, $version = null)
+    public function createApiServerByType(int $type, $version = null): ApiServerInterface
     {
         $name = ApiTypesHelper::typeToName($type);
+
         return $this->createApiServerByName($name, $version);
     }
 
     /**
-     * @param $name
+     * @param string   $name
      * @param int|null $version
      *
      * @return \Spotman\Api\ApiServerInterface
      * @throws \Spotman\Api\ApiException
      */
-    public function createApiServerByName($name, $version = null)
+    public function createApiServerByName(string $name, $version = null): ApiServerInterface
     {
         $className = '\\Spotman\\Api\\Server\\ApiServer'.$name;
 
@@ -37,8 +38,8 @@ class ApiServerFactory
 
         if (!($server instanceof ApiServerInterface)) {
             throw new ApiException('Class :class must implement :interface', [
-                ':class'    =>  get_class($server),
-                ':interface' =>  ApiClientInterface::class,
+                ':class'     => \get_class($server),
+                ':interface' => ApiClientInterface::class,
             ]);
         }
 

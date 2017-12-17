@@ -3,8 +3,8 @@ namespace Spotman\Api;
 
 interface ApiResourceProxyInterface
 {
-    const INTERNAL = 1;
-    const EXTERNAL = 2;
+    public const INTERNAL = 1;
+    public const EXTERNAL = 2;
 
     /**
      * @param string $methodName
@@ -12,7 +12,7 @@ interface ApiResourceProxyInterface
      *
      * @return ApiMethodResponse
      */
-    public function __call($methodName, $arguments);
+    public function __call($methodName, $arguments): ApiMethodResponse;
 
     /**
      * @param string $methodName
@@ -20,5 +20,5 @@ interface ApiResourceProxyInterface
      *
      * @return \Spotman\Api\ApiMethodResponse Result of the API call
      */
-    public function call($methodName, array $arguments);
+    public function call(string $methodName, array $arguments): ApiMethodResponse;
 }

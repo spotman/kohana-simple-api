@@ -6,8 +6,12 @@ interface ApiClientInterface
     /**
      * @param string $resource
      * @param string $method
-     * @param array $arguments
-     * @return \Spotman\Api\ApiMethodResponse
+     * @param array  $arguments
+     *
+     * @return ApiMethodResponse
      */
-    public function remote_procedure_call($resource, $method, array $arguments);
+    public function remote_procedure_call(
+        string $resource,
+        string $method, array $arguments
+    ): ApiMethodResponse;
 }

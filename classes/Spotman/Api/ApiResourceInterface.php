@@ -3,7 +3,7 @@ namespace Spotman\Api;
 
 interface ApiResourceInterface
 {
-    const SUFFIX = 'ApiResource';
+    public const SUFFIX = 'ApiResource';
 
     /**
      * @return string

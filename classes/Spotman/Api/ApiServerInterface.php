@@ -10,10 +10,9 @@ interface ApiServerInterface
      * @param \Request         $request
      * @param \Response        $response
      *
-     * @return
+     * @return void
      * @todo Remove dependencies for Kohana request and response (create 2 interfaces + 2 adapters for Kohana)
      * @todo Deal with Kohana-dependent JSONRPC module (rewrite it or drop it in favour of external library)
-     *
      */
-    public function process(API $api, \Request $request, \Response $response);
+    public function process(API $api, \Request $request, \Response $response): void;
 }

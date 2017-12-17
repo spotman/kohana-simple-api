@@ -2,6 +2,7 @@
 namespace Spotman\Api\ResourceProxy;
 
 use Spotman\Api\API;
+use Spotman\Api\ApiMethodResponse;
 
 class ExternalApiResourceProxy extends AbstractApiResourceProxy
 {
@@ -13,7 +14,7 @@ class ExternalApiResourceProxy extends AbstractApiResourceProxy
      *
      * @return \Spotman\Api\ApiMethodResponse Result of the API call
      */
-    public function call($methodName, array $arguments)
+    public function call(string $methodName, array $arguments): ApiMethodResponse
     {
         $client = API::clientFactory();
 

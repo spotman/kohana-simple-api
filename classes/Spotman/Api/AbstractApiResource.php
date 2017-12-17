@@ -1,7 +1,7 @@
 <?php
 namespace Spotman\Api;
 
-abstract class ApiResource implements ApiResourceInterface
+abstract class AbstractApiResource implements ApiResourceInterface
 {
     public function getName(): string
     {

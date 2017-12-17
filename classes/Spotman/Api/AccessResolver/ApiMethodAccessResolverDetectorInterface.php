@@ -1,8 +1,5 @@
 <?php
-
-
 namespace Spotman\Api\AccessResolver;
-
 
 use Spotman\Api\ApiMethodInterface;
 
@@ -13,5 +10,5 @@ interface ApiMethodAccessResolverDetectorInterface
      *
      * @return string AccessResolver codename
      */
-    public function detect(ApiMethodInterface $method);
+    public function detect(ApiMethodInterface $method): string;
 }

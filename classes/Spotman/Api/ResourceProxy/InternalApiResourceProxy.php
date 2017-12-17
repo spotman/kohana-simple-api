@@ -36,9 +36,15 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
      * @param \Spotman\Api\ApiResourceFactory                            $resourceFactory
      * @param \Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory $accessResolverFactory
      * @param \Spotman\Api\ApiMethodFactory                              $methodFactory
+     *
+     * @throws \Spotman\Api\ApiMethodException
      */
-    public function __construct($resourceName, ApiResourceFactory $resourceFactory, ApiMethodAccessResolverFactory $accessResolverFactory, ApiMethodFactory $methodFactory)
-    {
+    public function __construct(
+        string $resourceName,
+        ApiResourceFactory $resourceFactory,
+        ApiMethodAccessResolverFactory $accessResolverFactory,
+        ApiMethodFactory $methodFactory
+    ) {
         parent::__construct($resourceName);
 
         $this->resourceInstance      = $resourceFactory->create($resourceName);
@@ -53,8 +59,11 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
      * @param array  $arguments
      *
      * @return \Spotman\Api\ApiMethodResponse Result of the API call
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \Spotman\Api\ApiAccessViolationException
+     * @throws \Spotman\Api\ApiModelProxyException
      */
-    public function call($methodName, array $arguments)
+    public function call(string $methodName, array $arguments): ApiMethodResponse
     {
         return $this->callModelMethod($methodName, $arguments);
     }
@@ -64,10 +73,11 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
      * @param array  $arguments
      *
      * @return \Spotman\Api\ApiMethodResponse
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \Spotman\Api\ApiModelProxyException
-     * @throws \Spotman\Api\ApiModelProxyException
+     * @throws \Spotman\Api\ApiAccessViolationException
      */
-    protected function callModelMethod($methodName, array $arguments)
+    protected function callModelMethod(string $methodName, array $arguments): ApiMethodResponse
     {
         if ($this->resourceInstance instanceof ApiMethodsCollectionInterface) {
             $response = $this->callMethodsCollectionMethod($this->resourceInstance, $methodName, $arguments);
@@ -91,8 +101,20 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         return $response;
     }
 
-    protected function callMethodsCollectionMethod(ApiMethodsCollectionInterface $collection, $methodName, array $arguments)
-    {
+    /**
+     * @param \Spotman\Api\ApiMethodsCollectionInterface $collection
+     * @param string                                     $methodName
+     * @param array                                      $arguments
+     *
+     * @return null|\Spotman\Api\ApiMethodResponse
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \Spotman\Api\ApiAccessViolationException
+     */
+    protected function callMethodsCollectionMethod(
+        ApiMethodsCollectionInterface $collection,
+        string $methodName,
+        array $arguments
+    ): ?ApiMethodResponse {
         // Creating method instance
         $methodInstance = $this->methodFactory->createMethod($collection->getName(), $methodName, $arguments);
 
@@ -117,23 +139,30 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
      *
      * @return ApiMethodResponse
      * @throws \Spotman\Api\ApiModelProxyException
+     * @throws \Spotman\Api\ApiAccessViolationException
      */
-    protected function callApiModelMethod(ApiModelInterface $model, $methodName, array $arguments)
-    {
+    protected function callApiModelMethod(
+        ApiModelInterface $model,
+        string $methodName,
+        array $arguments
+    ): ApiMethodResponse {
         $this->checkModelPermissions();
 
-        if (!is_callable([$model, $methodName])) {
+        if (!\is_callable([$model, $methodName])) {
             throw new ApiModelProxyException('Unknown method :method in proxy object :class', [
                 ':method' => $methodName,
-                ':class'  => get_class($model),
+                ':class'  => \get_class($model),
             ]);
         }
 
         $arguments = API::prepareNamedArguments($model, $methodName, $arguments);
 
-        return call_user_func_array([$model, $methodName], $arguments);
+        return \call_user_func_array([$model, $methodName], $arguments);
     }
 
+    /**
+     * @throws \Spotman\Api\ApiAccessViolationException
+     */
     protected function checkModelPermissions()
     {
         // Skip models without permissions

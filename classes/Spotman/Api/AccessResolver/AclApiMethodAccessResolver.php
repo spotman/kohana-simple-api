@@ -8,7 +8,7 @@ use Spotman\Api\ApiMethodInterface;
 
 class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
 {
-    const CODENAME = 'Acl';
+    public const CODENAME = 'Acl';
 
     /**
      * @var \Spotman\Acl\AclInterface
@@ -29,8 +29,9 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
      * @param \Spotman\Api\ApiMethodInterface $method
      *
      * @return bool
+     * @throws \Spotman\Api\ApiMethodException
      */
-    public function isMethodAllowed(ApiMethodInterface $method)
+    public function isMethodAllowed(ApiMethodInterface $method): bool
     {
         $resource = $this->getAclResourceFromApiMethod($method);
 
@@ -39,11 +40,16 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
         return $resource->isPermissionAllowed($aclPermissionName);
     }
 
-    protected function getAclResourceFromApiMethod(ApiMethodInterface $method)
+    /**
+     * @param \Spotman\Api\ApiMethodInterface $method
+     *
+     * @return ResolvingResourceInterface
+     * @throws \Spotman\Api\ApiMethodException
+     */
+    protected function getAclResourceFromApiMethod(ApiMethodInterface $method): ResolvingResourceInterface
     {
         $aclResourceName = $method->getCollectionName();
 
-        /** @var ResolvingResourceInterface $resource */
         $resource = $this->acl->getResource($aclResourceName);
 
         if (!($resource instanceof ResolvingResourceInterface)) {

@@ -16,7 +16,7 @@ abstract class AbstractApiResourceProxy implements ApiResourceProxyInterface
      *
      * @param string $resourceName
      */
-    public function __construct($resourceName)
+    public function __construct(string $resourceName)
     {
         $this->resourceName = $resourceName;
     }
@@ -27,7 +27,7 @@ abstract class AbstractApiResourceProxy implements ApiResourceProxyInterface
      *
      * @return ApiMethodResponse
      */
-    final public function __call($methodName, $arguments)
+    final public function __call($methodName, $arguments): ApiMethodResponse
     {
         return $this->call($methodName, $arguments);
     }

@@ -1,9 +1,6 @@
 <?php
-
 namespace Spotman\Api\Client;
 
-use Spotman\Api\Client\ApiClientAbstract;
-use Exception;
 use JSONRPC_Client;
 use Spotman\Api\ApiException;
 use Spotman\Api\ApiMethodResponse;
@@ -11,22 +8,22 @@ use Spotman\Api\ApiMethodResponse;
 class ApiClientJsonRpc extends ApiClientAbstract
 {
     /**
-     * @param       $resource
-     * @param       $method
-     * @param array $arguments
+     * @param string $resource
+     * @param string $method
+     * @param array  $arguments
      *
      * @return ApiMethodResponse
-     * @throws ApiException
+     * @throws \Spotman\Api\ApiException
      */
-    public function remote_procedure_call($resource, $method, array $arguments)
+    public function remote_procedure_call(string $resource, string $method, array $arguments): ApiMethodResponse
     {
         $url    = $this->get_url();
         $client = JSONRPC_Client::factory();
 
         try {
-            $data = $client->call($url, $resource . '.' . $method, $arguments);
-        } catch (Exception $e) {
-            throw new ApiException($e->getMessage(), NULL, $e);
+            $data = $client->call($url, $resource.'.'.$method, $arguments);
+        } catch (\Throwable $e) {
+            throw new ApiException($e->getMessage(), null, $e->getCode(), $e);
         }
 
         $lastModified = $client->get_last_modified();

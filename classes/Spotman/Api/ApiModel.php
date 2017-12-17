@@ -6,4 +6,4 @@ namespace Spotman\Api;
  * @package Spotman\Api
  * @deprecated Use ApiMethods instead
  */
-abstract class ApiModel extends ApiResource implements ApiModelInterface {}
+abstract class ApiModel extends AbstractApiResource implements ApiModelInterface {}

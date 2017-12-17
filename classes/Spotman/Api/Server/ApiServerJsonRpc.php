@@ -16,7 +16,7 @@ class ApiServerJsonRpc extends ApiServerAbstract
      * @param Request          $request
      * @param Response         $response
      */
-    public function process(API $api, \Request $request, \Response $response)
+    public function process(API $api, \Request $request, \Response $response): void
     {
         $server = JSONRPC_Server::factory($response);
 

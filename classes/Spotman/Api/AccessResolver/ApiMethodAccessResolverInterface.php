@@ -10,5 +10,5 @@ interface ApiMethodAccessResolverInterface
      *
      * @return bool
      */
-    public function isMethodAllowed(ApiMethodInterface $method);
+    public function isMethodAllowed(ApiMethodInterface $method): bool;
 }

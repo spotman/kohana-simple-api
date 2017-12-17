@@ -1,7 +1,7 @@
 <?php
 namespace Spotman\Api;
 
-abstract class AbstractMethodsCollectionApiResource extends ApiResource implements ApiMethodsCollectionInterface
+abstract class AbstractMethodsCollectionApiResource extends AbstractApiResource implements ApiMethodsCollectionInterface
 {
     /**
      * @var \Spotman\Api\API

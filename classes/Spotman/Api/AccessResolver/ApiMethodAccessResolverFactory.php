@@ -40,7 +40,7 @@ class ApiMethodAccessResolverFactory
      * @return \Spotman\Api\AccessResolver\ApiMethodAccessResolverInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createFromApiMethod(ApiMethodInterface $method)
+    public function createFromApiMethod(ApiMethodInterface $method): ApiMethodAccessResolverInterface
     {
         $name = $this->accessResolverDetector->detect($method);
 
@@ -53,7 +53,7 @@ class ApiMethodAccessResolverFactory
      * @return \Spotman\Api\AccessResolver\ApiMethodAccessResolverInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    private function create($name)
+    private function create(string $name): ApiMethodAccessResolverInterface
     {
         return $this->factory->create($name);
     }
