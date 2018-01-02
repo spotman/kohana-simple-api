@@ -23,7 +23,7 @@ class ApiClientJsonRpc extends ApiClientAbstract
         try {
             $data = $client->call($url, $resource.'.'.$method, $arguments);
         } catch (\Throwable $e) {
-            throw new ApiException($e->getMessage(), null, $e->getCode(), $e);
+            throw new ApiException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
         }
 
         $lastModified = $client->get_last_modified();
