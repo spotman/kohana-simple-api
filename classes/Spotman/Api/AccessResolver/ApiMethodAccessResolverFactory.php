@@ -29,7 +29,7 @@ class ApiMethodAccessResolverFactory
         $this->factory = $factory
             ->cacheInstances()
             ->addRootNamespace('Spotman')
-            ->setClassPrefixes('Api', 'AccessResolver')
+            ->setClassNamespaces('Api', 'AccessResolver')
             ->setClassSuffix('ApiMethodAccessResolver')
             ->setExpectedInterface(ApiMethodAccessResolverInterface::class);
     }

@@ -22,12 +22,12 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     ];
 
     /**
-     * @param null           $data
-     * @param \DateTime|null $lastModified
+     * @param null                    $data
+     * @param \DateTimeInterface|null $lastModified
      *
      * @return \Spotman\Api\ApiMethodResponse
      */
-    public static function factory($data = NULL, DateTime $lastModified = NULL)
+    public static function factory($data = null, \DateTimeInterface $lastModified = null)
     {
         $obj = new static;
 
@@ -62,11 +62,11 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     }
 
     /**
-     * @param DateTime $lastModified
+     * @param \DateTimeInterface $lastModified
      *
      * @return $this
      */
-    public function setLastModified(DateTime $lastModified)
+    public function setLastModified(\DateTimeInterface $lastModified)
     {
         $this->lastModified = $lastModified;
 
@@ -74,22 +74,22 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     }
 
     /**
-     * @return NULL|DateTime
+     * @return \DateTimeInterface|null
      */
     public function getLastModified()
     {
-        return $this->lastModified ?: new DateTime;
+        return $this->lastModified ?: new \DateTimeImmutable;
     }
 
     public function fromArray(array $input)
     {
         $data = isset($input['data'])
             ? $input['data']
-            : NULL;
+            : null;
 
         $lastModifiedTimestamp = isset($input['last_modified'])
             ? $input['last_modified']
-            : NULL;
+            : null;
 
 //        if ( ! $data )
 //            throw new ApiResponseException('Data is missing');
@@ -98,7 +98,7 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
             throw new ApiResponseException('Last modified time is missing');
         }
 
-        $lastModifiedObject = (new DateTime())->setTimestamp($lastModifiedTimestamp);
+        $lastModifiedObject = (new \DateTimeImmutable)->setTimestamp($lastModifiedTimestamp);
 
         return $this
             ->setData($data)
@@ -107,7 +107,7 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
 
     public function asArray()
     {
-        $lastModified = $this->getLastModified() ?: new DateTime;
+        $lastModified = $this->getLastModified() ?: new \DateTimeImmutable;
 
         return [
             'data'          => $this->getData(),
@@ -124,14 +124,14 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getJsonRpcResponseLastModified()
     {
         return $this->getLastModified();
     }
 
-    protected function processLastModified(DateTime $newLastModified)
+    protected function processLastModified(\DateTimeInterface $newLastModified)
     {
         if ($this->lastModified && $newLastModified > $this->lastModified) {
             $this->lastModified = $newLastModified;
@@ -140,11 +140,11 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
 
     protected function convertResult($modelCallResult)
     {
-        if (is_object($modelCallResult)) {
+        if (\is_object($modelCallResult)) {
             return $this->convertResultObject($modelCallResult);
         }
 
-        if (is_array($modelCallResult)) {
+        if (\is_array($modelCallResult)) {
             return $this->convertResultTraversable($modelCallResult);
         }
 
@@ -197,9 +197,9 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
 
     protected function convertResultSimple($data)
     {
-        $type = gettype($data);
+        $type = \gettype($data);
 
-        if (!in_array(strtolower($type), static::$allowedResultTypes, TRUE)) {
+        if (!\in_array(strtolower($type), static::$allowedResultTypes, true)) {
             throw new ApiMethodException('API model must not return values of type :type', [':type' => $type]);
         }
 
