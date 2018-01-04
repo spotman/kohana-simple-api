@@ -16,7 +16,7 @@ class ApiResourceFactory
     {
         $this->factory = $factory
             ->setExpectedInterface(ApiResourceInterface::class)
-            ->setClassPrefixes('Api', 'Resource')
+            ->setClassNamespaces('Api', 'Resource')
             ->setClassSuffix(ApiResourceInterface::SUFFIX);
     }
 

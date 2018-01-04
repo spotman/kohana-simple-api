@@ -35,7 +35,7 @@ class ApiMethodFactory
      */
     public function createMethod($collectionName, $methodName, array $arguments): ApiMethodInterface
     {
-        $this->factory->setClassPrefixes('Api', 'Method', ucfirst($collectionName));
+        $this->factory->setClassNamespaces('Api', 'Method', ucfirst($collectionName));
 
         return $this->factory->create(ucfirst($methodName), $arguments);
     }

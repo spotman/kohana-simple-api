@@ -28,7 +28,7 @@ class ApiResourceProxyFactory
         $this->factory = $factory
             ->addRootNamespace('Spotman')
             ->setExpectedInterface(ApiResourceProxyInterface::class)
-            ->setClassPrefixes('Api', 'ResourceProxy')
+            ->setClassNamespaces('Api', 'ResourceProxy')
             ->setClassSuffix('ApiResourceProxy');
     }
 
