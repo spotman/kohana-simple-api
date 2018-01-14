@@ -2,10 +2,18 @@
 namespace Spotman\Api;
 
 use Arr;
+use BetaKiller\Config\ConfigProviderInterface;
 use Kohana;
 
 class API
 {
+    public const CONFIG_CLIENT_TYPE    = ['api', 'client', 'type'];
+    public const CONFIG_CLIENT_HOST    = ['api', 'client', 'host'];
+    public const CONFIG_CLIENT_VERSION = ['api', 'client', 'version'];
+    public const CONFIG_CLIENT_PROXY   = ['api', 'client', 'proxy'];
+
+    public const CONFIG_SERVER_ENABLED = ['api', 'server', 'enabled'];
+
     /**
      * @var \Spotman\Api\ApiResourceProxyFactory
      */
@@ -17,54 +25,28 @@ class API
     protected $serverFactory;
 
     /**
+     * @var \BetaKiller\Config\ConfigProviderInterface
+     */
+    private $configProvider;
+
+    /**
      * API constructor.
      *
-     * @param \Spotman\Api\ApiResourceProxyFactory $proxyFactory
-     * @param \Spotman\Api\ApiServerFactory        $serverFactory
+     * @param \Spotman\Api\ApiResourceProxyFactory       $proxyFactory
+     * @param \Spotman\Api\ApiServerFactory              $serverFactory
+     * @param \BetaKiller\Config\ConfigProviderInterface $configProvider
      */
-    public function __construct(ApiResourceProxyFactory $proxyFactory, ApiServerFactory $serverFactory)
-    {
-        $this->proxyFactory  = $proxyFactory;
-        $this->serverFactory = $serverFactory;
+    public function __construct(
+        ApiResourceProxyFactory $proxyFactory,
+        ApiServerFactory $serverFactory,
+        ConfigProviderInterface $configProvider
+    ) {
+        $this->proxyFactory   = $proxyFactory;
+        $this->serverFactory  = $serverFactory;
+        $this->configProvider = $configProvider;
     }
 
-    // TODO ApiFactory getting config and all needed dependencies
-
-    /**
-     * @deprecated
-     * @return \Spotman\Api\ApiClientInterface
-     */
-    public static function clientFactory()
-    {
-        $type    = static::config('client.type');
-        $host    = static::config('client.host');
-        $version = static::config('client.version');
-
-        // TODO DI
-        $factory = new ApiClientFactory;
-
-        return $factory->createApiClientByType($type, $host, $version);
-    }
-
-    /**
-     * @param string $key
-     * @param null   $default_value
-     *
-     * @deprecated Use BetaKiller\ConfigProviderInterface + DI instead
-     * @return string|int
-     */
-    protected static function config($key, $default_value = null)
-    {
-        static $config;
-
-        if ($config === null) {
-            $config = Kohana::config('api')->as_array();
-        }
-
-        return Arr::path($config, $key, $default_value);
-    }
-
-    public static function prepareNamedArguments($classNameOrObject, $methodName, array $requestArguments)
+    public static function prepareNamedArguments($classNameOrObject, string $methodName, array $requestArguments): array
     {
         // Skip calls without arguments
         if (!$requestArguments) {
@@ -72,7 +54,7 @@ class API
         }
 
         // Using named arguments already, skip processing
-        if (is_string(key($requestArguments))) {
+        if (\is_string(key($requestArguments))) {
             return $requestArguments;
         }
 
@@ -102,34 +84,23 @@ class API
      * @param              $version
      *
      * @return \Spotman\Api\ApiServerInterface
+     * @throws \Spotman\Api\ApiException
      */
-    public function createServer($type, $version)
+    public function createServer($type, $version): ApiServerInterface
     {
-        if (!$this->isServerEnabled()) {
-            throw new ApiException('API server is not enabled');
-        }
-
         return $this->serverFactory->createApiServerByType($type, $version);
     }
 
     /**
-     * @return bool
-     */
-    protected function isServerEnabled()
-    {
-        return (bool)static::config('server.enabled', false);
-    }
-
-    /**
      * @param string   $resourceName API Model name
-     * @param int|null $proxyType Const ApiResourceProxyInterface::INTERNAL or ApiResourceProxyInterface::EXTERNAL
+     * @param int|null $proxyType    Const ApiResourceProxyInterface::INTERNAL or ApiResourceProxyInterface::EXTERNAL
      *
      * @return \Spotman\Api\ApiResourceProxyInterface
      */
-    public function get($resourceName, $proxyType = null)
+    public function get(string $resourceName, ?int $proxyType = null): ApiResourceProxyInterface
     {
         if ($proxyType === null) {
-            $proxyType = (int)static::config('client.proxy', ApiResourceProxyInterface::INTERNAL);
+            $proxyType = $this->configProvider->load(self::CONFIG_CLIENT_PROXY) ?: ApiResourceProxyInterface::INTERNAL;
         }
 
         return $this->createResourceProxy($proxyType, $resourceName);
@@ -143,7 +114,7 @@ class API
      *
      * @return \Spotman\Api\ApiResourceProxyInterface
      */
-    protected function createResourceProxy($type, $resourceName)
+    protected function createResourceProxy(int $type, string $resourceName): ApiResourceProxyInterface
     {
         return $this->proxyFactory->createFromType($type, $resourceName);
     }

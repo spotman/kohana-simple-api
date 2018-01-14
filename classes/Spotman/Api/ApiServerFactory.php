@@ -1,8 +1,25 @@
 <?php
 namespace Spotman\Api;
 
+use BetaKiller\Config\ConfigProviderInterface;
+
 class ApiServerFactory
 {
+    /**
+     * @var \BetaKiller\Config\ConfigProviderInterface
+     */
+    private $configProvider;
+
+    /**
+     * ApiServerFactory constructor.
+     *
+     * @param \BetaKiller\Config\ConfigProviderInterface $configProvider
+     */
+    public function __construct(ConfigProviderInterface $configProvider)
+    {
+        $this->configProvider = $configProvider;
+    }
+
     /**
      * @param int      $type
      * @param int|null $version
@@ -26,6 +43,10 @@ class ApiServerFactory
      */
     public function createApiServerByName(string $name, $version = null): ApiServerInterface
     {
+        if (!$this->isServerEnabled()) {
+            throw new ApiException('API server is not enabled');
+        }
+
         $className = '\\Spotman\\Api\\Server\\ApiServer'.$name;
 
         // TODO Deal with version
@@ -44,5 +65,13 @@ class ApiServerFactory
         }
 
         return $server;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isServerEnabled(): bool
+    {
+        return (bool)$this->configProvider->load(API::CONFIG_SERVER_ENABLED);
     }
 }

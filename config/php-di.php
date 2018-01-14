@@ -5,10 +5,10 @@ use Spotman\Api\AccessResolver\DefaultApiMethodAccessResolverDetector;
 
 return [
 
-    'definitions'       =>  [
+    'definitions' => [
 
         // Basic access resolver detector
-        ApiMethodAccessResolverDetectorInterface::class => DI\object(DefaultApiMethodAccessResolverDetector::class),
+        ApiMethodAccessResolverDetectorInterface::class => DI\get(DefaultApiMethodAccessResolverDetector::class),
 
     ],
 
