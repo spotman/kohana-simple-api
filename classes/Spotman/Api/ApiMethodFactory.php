@@ -1,7 +1,7 @@
 <?php
 namespace Spotman\Api;
 
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 
 class ApiMethodFactory
 {
@@ -13,11 +13,12 @@ class ApiMethodFactory
     /**
      * ApiMethodFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactory $factory)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->setClassSuffix(ApiMethodInterface::SUFFIX)
             ->setExpectedInterface(ApiMethodInterface::class)
             ->prepareArgumentsWith(function ($arguments, $className) {

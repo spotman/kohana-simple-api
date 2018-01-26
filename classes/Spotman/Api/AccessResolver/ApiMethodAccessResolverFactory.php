@@ -1,7 +1,7 @@
 <?php
 namespace Spotman\Api\AccessResolver;
 
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 use Spotman\Api\ApiMethodInterface;
 
 class ApiMethodAccessResolverFactory
@@ -19,14 +19,17 @@ class ApiMethodAccessResolverFactory
     /**
      * ApiResourceFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory                            $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      * @param \Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface $detector
      */
-    public function __construct(NamespaceBasedFactory $factory, ApiMethodAccessResolverDetectorInterface $detector)
-    {
+    public function __construct(
+        NamespaceBasedFactoryBuilder $factoryBuilder,
+        ApiMethodAccessResolverDetectorInterface $detector
+    ) {
         $this->accessResolverDetector = $detector;
 
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->cacheInstances()
             ->addRootNamespace('Spotman')
             ->setClassNamespaces('Api', 'AccessResolver')

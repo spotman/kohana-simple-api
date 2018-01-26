@@ -1,7 +1,7 @@
 <?php
 namespace Spotman\Api;
 
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 
 class ApiResourceFactory
 {
@@ -10,11 +10,12 @@ class ApiResourceFactory
     /**
      * ApiResourceFactory constructor.
      *
-     * @param NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactory $factory)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->setExpectedInterface(ApiResourceInterface::class)
             ->setClassNamespaces('Api', 'Resource')
             ->setClassSuffix(ApiResourceInterface::SUFFIX);
@@ -24,9 +25,9 @@ class ApiResourceFactory
      * @param string $name
      *
      * @return \Spotman\Api\ApiResourceInterface
-     * @throws \Spotman\Api\ApiMethodException
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function create($name)
+    public function create($name): ApiResourceInterface
     {
         /** @var \Spotman\Api\ApiResourceInterface $resource */
         return $this->factory->create($name);
