@@ -26,8 +26,9 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
      * @param \DateTimeInterface|null $lastModified
      *
      * @return \Spotman\Api\ApiMethodResponse
+     * @throws \Spotman\Api\ApiMethodException
      */
-    public static function factory($data = null, \DateTimeInterface $lastModified = null)
+    public static function factory($data = null, \DateTimeInterface $lastModified = null): ApiMethodResponse
     {
         $obj = new static;
 
@@ -44,8 +45,9 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
      * @param mixed $data
      *
      * @return \Spotman\Api\ApiMethodResponse
+     * @throws \Spotman\Api\ApiMethodException
      */
-    public function setData($data)
+    public function setData($data): ApiMethodResponse
     {
         // Cleanup data and cast it to array structures and scalar types
         $this->data = $this->convertResult($data);
@@ -76,23 +78,23 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     /**
      * @return \DateTimeInterface|null
      */
-    public function getLastModified()
+    public function getLastModified(): ?\DateTimeInterface
     {
         return $this->lastModified ?: new \DateTimeImmutable;
     }
 
-    public function fromArray(array $input)
+    /**
+     * @param array $input
+     *
+     * @return \Spotman\Api\ApiMethodResponse
+     * @throws \Spotman\Api\ApiMethodException
+     * @throws \Spotman\Api\ApiResponseException
+     */
+    public function fromArray(array $input): ApiMethodResponse
     {
-        $data = isset($input['data'])
-            ? $input['data']
-            : null;
+        $data = $input['data'] ?? null;
 
-        $lastModifiedTimestamp = isset($input['last_modified'])
-            ? $input['last_modified']
-            : null;
-
-//        if ( ! $data )
-//            throw new ApiResponseException('Data is missing');
+        $lastModifiedTimestamp = $input['last_modified'] ?? null;
 
         if (!$lastModifiedTimestamp) {
             throw new ApiResponseException('Last modified time is missing');
@@ -105,7 +107,10 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
             ->setLastModified($lastModifiedObject);
     }
 
-    public function asArray()
+    /**
+     * @return array
+     */
+    public function asArray(): array
     {
         $lastModified = $this->getLastModified() ?: new \DateTimeImmutable;
 
@@ -126,7 +131,7 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     /**
      * @return \DateTimeInterface|null
      */
-    public function getJsonRpcResponseLastModified()
+    public function getJsonRpcResponseLastModified(): ?\DateTimeInterface
     {
         return $this->getLastModified();
     }
@@ -138,6 +143,12 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
         }
     }
 
+    /**
+     * @param $modelCallResult
+     *
+     * @return array|int|string|bool|double|null
+     * @throws \Spotman\Api\ApiMethodException
+     */
     protected function convertResult($modelCallResult)
     {
         if (\is_object($modelCallResult)) {
@@ -161,10 +172,10 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     {
         if ($object instanceof ApiResponseItemInterface) {
             // Get item`s last modified time for setting it in current response
-            $last_modified = $object->getApiLastModified();
+            $lastModified = $object->getApiLastModified();
 
-            if ($last_modified) {
-                $this->processLastModified($last_modified);
+            if ($lastModified) {
+                $this->processLastModified($lastModified);
             }
 
             return $object->getApiResponseData();
@@ -183,8 +194,9 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
      * @param array|\Traversable $traversable
      *
      * @return array
+     * @throws \Spotman\Api\ApiMethodException
      */
-    protected function convertResultTraversable($traversable)
+    protected function convertResultTraversable($traversable): array
     {
         $data = [];
 
@@ -195,6 +207,12 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
         return $data;
     }
 
+    /**
+     * @param $data
+     *
+     * @return mixed
+     * @throws \Spotman\Api\ApiMethodException
+     */
     protected function convertResultSimple($data)
     {
         $type = \gettype($data);
