@@ -39,7 +39,7 @@ abstract class AbstractMethodsCollectionApiResource extends AbstractApiResource 
      *
      * @return \Spotman\Api\ApiMethodResponse
      */
-    protected function call($name, array $arguments)
+    protected function call($name, array $arguments): ApiMethodResponse
     {
         // Forward call to API subsystem
         return $this->api->get($this->getName())->call($name, $arguments);
