@@ -1,9 +1,7 @@
 <?php
 namespace Spotman\Api;
 
-use Arr;
 use BetaKiller\Config\ConfigProviderInterface;
-use Kohana;
 
 class API
 {
