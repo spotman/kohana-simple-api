@@ -2,7 +2,7 @@
 namespace Spotman\Api\ResourceProxy;
 
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory;
-use Spotman\Api\API;
+use Spotman\Api\ApiFacade;
 use Spotman\Api\ApiAccessViolationException;
 use Spotman\Api\ApiMethodFactory;
 use Spotman\Api\ApiMethodResponse;
@@ -37,7 +37,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
      * @param \Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory $accessResolverFactory
      * @param \Spotman\Api\ApiMethodFactory                              $methodFactory
      *
-     * @throws \Spotman\Api\ApiMethodException
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function __construct(
         string $resourceName,
@@ -53,22 +53,6 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
     }
 
     /**
-     * Simple proxy call to model method
-     *
-     * @param string $methodName
-     * @param array  $arguments
-     *
-     * @return \Spotman\Api\ApiMethodResponse Result of the API call
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \Spotman\Api\ApiAccessViolationException
-     * @throws \Spotman\Api\ApiModelProxyException
-     */
-    public function call(string $methodName, array $arguments): ApiMethodResponse
-    {
-        return $this->callModelMethod($methodName, $arguments);
-    }
-
-    /**
      * @param string $methodName
      * @param array  $arguments
      *
@@ -77,25 +61,12 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
      * @throws \Spotman\Api\ApiModelProxyException
      * @throws \Spotman\Api\ApiAccessViolationException
      */
-    protected function callModelMethod(string $methodName, array $arguments): ApiMethodResponse
+    protected function callResourceMethod(string $methodName, array $arguments): ?ApiMethodResponse
     {
         if ($this->resourceInstance instanceof ApiMethodsCollectionInterface) {
             $response = $this->callMethodsCollectionMethod($this->resourceInstance, $methodName, $arguments);
         } else {
             $response = $this->callApiModelMethod($this->resourceInstance, $methodName, $arguments);
-        }
-
-        // For methods with empty response
-        if ($response === null) {
-            $response = ApiMethodResponse::factory();
-        }
-
-        if (!($response instanceof ApiMethodResponse)) {
-            throw new ApiModelProxyException('Api model method [:model.:method] must return :must or null', [
-                ':model'  => $this->resourceName,
-                ':method' => $methodName,
-                ':must'   => ApiMethodResponse::class,
-            ]);
         }
 
         return $response;
@@ -145,7 +116,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         ApiModelInterface $model,
         string $methodName,
         array $arguments
-    ): ApiMethodResponse {
+    ): ?ApiMethodResponse {
         $this->checkModelPermissions();
 
         if (!\is_callable([$model, $methodName])) {
@@ -155,7 +126,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
             ]);
         }
 
-        $arguments = API::prepareNamedArguments($model, $methodName, $arguments);
+        $arguments = ApiFacade::prepareNamedArguments($model, $methodName, $arguments);
 
         return \call_user_func_array([$model, $methodName], $arguments);
     }

@@ -25,15 +25,13 @@ class ExternalApiResourceProxy extends AbstractApiResourceProxy
     }
 
     /**
-     * Performs remote API call
-     *
      * @param string $methodName
      * @param array  $arguments
      *
-     * @return \Spotman\Api\ApiMethodResponse Result of the API call
+     * @return \Spotman\Api\ApiMethodResponse
      * @throws \Spotman\Api\ApiException
      */
-    public function call(string $methodName, array $arguments): ApiMethodResponse
+    protected function callResourceMethod(string $methodName, array $arguments): ?ApiMethodResponse
     {
         $client = $this->clientFactory->createDefault();
 

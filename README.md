@@ -102,7 +102,7 @@ Installation
 <?php
 namespace Application;
 
-class API extends \Spotman\Api\API {
+class ApiFacade extends \Spotman\Api\ApiFacade {
 
     /**
      * @return \API_Model_Category
@@ -135,10 +135,10 @@ class API extends \Spotman\Api\API {
 
 ```php
 <?php
-use Application\API;
+use Application\ApiFacade;
 
-// Instantiate your API class via new keyword or via dependency injection
-$api = new API;
+// Instantiate your ApiFacade class via new keyword or via dependency injection
+$api = new ApiFacade;
 
 // API call returns instance of ApiMethodResponse
 $categoriesResponse = $api->category()->all();

@@ -72,6 +72,6 @@ class ApiServerFactory
      */
     protected function isServerEnabled(): bool
     {
-        return (bool)$this->configProvider->load(API::CONFIG_SERVER_ENABLED);
+        return (bool)$this->configProvider->load(ApiFacade::CONFIG_SERVER_ENABLED);
     }
 }

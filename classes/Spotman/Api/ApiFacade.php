@@ -3,7 +3,7 @@ namespace Spotman\Api;
 
 use BetaKiller\Config\ConfigProviderInterface;
 
-class API
+class ApiFacade
 {
     public const CONFIG_CLIENT_TYPE    = ['api', 'client', 'type'];
     public const CONFIG_CLIENT_HOST    = ['api', 'client', 'host'];
@@ -44,6 +44,15 @@ class API
         $this->configProvider = $configProvider;
     }
 
+    /**
+     * @param        $classNameOrObject
+     * @param string $methodName
+     * @param array  $requestArguments
+     *
+     * @return array
+     * @throws \Spotman\Api\ApiException
+     * @throws \ReflectionException
+     */
     public static function prepareNamedArguments($classNameOrObject, string $methodName, array $requestArguments): array
     {
         // Skip calls without arguments
@@ -58,8 +67,6 @@ class API
 
         $namedArguments = [];
 
-        // TODO deal with missed/unordered arguments
-
         $reflection = new \ReflectionClass($classNameOrObject);
         $parameters = $reflection->getMethod($methodName)->getParameters();
 
@@ -69,6 +76,12 @@ class API
             if (isset($requestArguments[$position])) {
                 $key                  = $param->getName();
                 $namedArguments[$key] = $requestArguments[$position];
+            } elseif (!$param->isOptional()) {
+                throw new ApiException('Missing parameter :name for :class:::method', [
+                    ':name' => $param->getName(),
+                    ':class' => $reflection->getName(),
+                    ':method' => $methodName,
+                ]);
             }
         }
 
@@ -94,6 +107,8 @@ class API
      * @param int|null $proxyType    Const ApiResourceProxyInterface::INTERNAL or ApiResourceProxyInterface::EXTERNAL
      *
      * @return \Spotman\Api\ApiResourceProxyInterface
+     * @throws \Spotman\Api\ApiModelProxyException
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function get(string $resourceName, ?int $proxyType = null): ApiResourceProxyInterface
     {
@@ -111,8 +126,10 @@ class API
      * @param string $resourceName
      *
      * @return \Spotman\Api\ApiResourceProxyInterface
+     * @throws \Spotman\Api\ApiModelProxyException
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function createResourceProxy(int $type, string $resourceName): ApiResourceProxyInterface
+    private function createResourceProxy(int $type, string $resourceName): ApiResourceProxyInterface
     {
         return $this->proxyFactory->createFromType($type, $resourceName);
     }

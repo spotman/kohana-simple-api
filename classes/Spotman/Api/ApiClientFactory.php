@@ -56,9 +56,9 @@ class ApiClientFactory
      */
     public function createDefault(): ApiClientInterface
     {
-        $type    = (string)$this->configProvider->load(API::CONFIG_CLIENT_TYPE);
-        $host    = (string)$this->configProvider->load(API::CONFIG_CLIENT_HOST);
-        $version = (string)$this->configProvider->load(API::CONFIG_CLIENT_VERSION);
+        $type    = (string)$this->configProvider->load(ApiFacade::CONFIG_CLIENT_TYPE);
+        $host    = (string)$this->configProvider->load(ApiFacade::CONFIG_CLIENT_HOST);
+        $version = (string)$this->configProvider->load(ApiFacade::CONFIG_CLIENT_VERSION);
 
         return $this->createApiClientByType($type, $host, $version);
     }

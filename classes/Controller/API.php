@@ -1,13 +1,13 @@
 <?php
 
-use Spotman\Api\API;
+use Spotman\Api\ApiFacade;
 use Spotman\Api\ApiTypesHelper;
 
 class Controller_API extends Controller
 {
     /**
      * @Inject
-     * @var API
+     * @var ApiFacade
      */
     private $api;
 

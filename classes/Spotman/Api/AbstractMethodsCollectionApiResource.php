@@ -4,16 +4,16 @@ namespace Spotman\Api;
 abstract class AbstractMethodsCollectionApiResource extends AbstractApiResource implements ApiMethodsCollectionInterface
 {
     /**
-     * @var \Spotman\Api\API
+     * @var \Spotman\Api\ApiFacade
      */
     protected $api;
 
     /**
      * AbstractMethodsCollectionApiResource constructor.
      *
-     * @param \Spotman\Api\API $api
+     * @param \Spotman\Api\ApiFacade $api
      */
-    public function __construct(API $api)
+    public function __construct(ApiFacade $api)
     {
         $this->api = $api;
     }
