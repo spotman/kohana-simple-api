@@ -77,6 +77,13 @@ class ApiFacade
                 $key                  = $param->getName();
                 $namedArguments[$key] = $requestArguments[$position];
             } elseif (!$param->isOptional()) {
+                $argType = $param->getType();
+
+                // Skip parameters with class type hint coz they would be injected from DI container
+                if ($argType && !$argType->isBuiltin()) {
+                    continue;
+                }
+
                 throw new ApiException('Missing parameter :name for :class:::method', [
                     ':name' => $param->getName(),
                     ':class' => $reflection->getName(),
