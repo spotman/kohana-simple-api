@@ -73,10 +73,13 @@ class ApiFacade
         foreach ($parameters as $param) {
             $position = $param->getPosition();
 
-            if (isset($requestArguments[$position])) {
+            if (array_key_exists($position, $requestArguments)) {
                 $key                  = $param->getName();
                 $namedArguments[$key] = $requestArguments[$position];
-            } elseif (!$param->isOptional()) {
+            } elseif ($param->isOptional()) {
+                $key                  = $param->getName();
+                $namedArguments[$key] = $param->getDefaultValue();
+            } else {
                 $argType = $param->getType();
 
                 // Skip parameters with class type hint coz they would be injected from DI container
