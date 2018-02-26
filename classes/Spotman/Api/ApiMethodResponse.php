@@ -170,6 +170,10 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
      */
     protected function convertResultObject($object)
     {
+        if ($object instanceof \JsonSerializable) {
+            return $object->jsonSerialize();
+        }
+
         if ($object instanceof ApiResponseItemInterface) {
             // Get item`s last modified time for setting it in current response
             $lastModified = $object->getApiLastModified();
