@@ -123,7 +123,7 @@ class ApiFacade
     public function get(string $resourceName, ?int $proxyType = null): ApiResourceProxyInterface
     {
         if ($proxyType === null) {
-            $proxyType = $this->configProvider->load(self::CONFIG_CLIENT_PROXY) ?: ApiResourceProxyInterface::INTERNAL;
+            $proxyType = (int)$this->configProvider->load(self::CONFIG_CLIENT_PROXY) ?: ApiResourceProxyInterface::INTERNAL;
         }
 
         return $this->createResourceProxy($proxyType, $resourceName);
