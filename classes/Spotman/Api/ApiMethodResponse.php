@@ -26,7 +26,6 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
      * @param \DateTimeInterface|null $lastModified
      *
      * @return \Spotman\Api\ApiMethodResponse
-     * @throws \Spotman\Api\ApiMethodException
      */
     public static function factory($data = null, \DateTimeInterface $lastModified = null): ApiMethodResponse
     {
@@ -68,7 +67,7 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
      *
      * @return $this
      */
-    public function setLastModified(\DateTimeInterface $lastModified)
+    public function setLastModified(\DateTimeInterface $lastModified): ApiMethodResponse
     {
         $this->lastModified = $lastModified;
 
@@ -76,9 +75,9 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return \DateTimeInterface
      */
-    public function getLastModified(): ?\DateTimeInterface
+    public function getLastModified(): \DateTimeInterface
     {
         return $this->lastModified ?: new \DateTimeImmutable;
     }
@@ -112,11 +111,9 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
      */
     public function asArray(): array
     {
-        $lastModified = $this->getLastModified() ?: new \DateTimeImmutable;
-
         return [
             'data'          => $this->getData(),
-            'last_modified' => $lastModified->getTimestamp(),
+            'last_modified' => $this->getLastModified()->getTimestamp(),
         ];
     }
 
@@ -136,7 +133,7 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
         return $this->getLastModified();
     }
 
-    protected function processLastModified(\DateTimeInterface $newLastModified)
+    protected function processLastModified(\DateTimeInterface $newLastModified): void
     {
         if ($this->lastModified && $newLastModified > $this->lastModified) {
             $this->lastModified = $newLastModified;
@@ -165,7 +162,7 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     /**
      * @param $object
      *
-     * @returns int|string|array
+     * @return int|string|array
      * @throws ApiMethodException
      */
     protected function convertResultObject($object)
