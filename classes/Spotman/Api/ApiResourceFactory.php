@@ -29,7 +29,6 @@ class ApiResourceFactory
      */
     public function create($name): ApiResourceInterface
     {
-        /** @var \Spotman\Api\ApiResourceInterface $resource */
         return $this->factory->create($name);
     }
 }

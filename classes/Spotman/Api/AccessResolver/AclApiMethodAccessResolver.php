@@ -1,6 +1,7 @@
 <?php
 namespace Spotman\Api\AccessResolver;
 
+use BetaKiller\Model\UserInterface;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Api\ApiMethodException;
@@ -27,13 +28,16 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
 
     /**
      * @param \Spotman\Api\ApiMethodInterface $method
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return bool
      * @throws \Spotman\Api\ApiMethodException
      */
-    public function isMethodAllowed(ApiMethodInterface $method): bool
+    public function isMethodAllowed(ApiMethodInterface $method, UserInterface $user): bool
     {
         $resource = $this->getAclResourceFromApiMethod($method);
+
+        $this->acl->injectUserResolver($user, $resource);
 
         $aclPermissionName = $method->getName();
 

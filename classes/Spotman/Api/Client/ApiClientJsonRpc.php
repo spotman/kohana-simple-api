@@ -1,23 +1,31 @@
 <?php
 namespace Spotman\Api\Client;
 
+use BetaKiller\Model\UserInterface;
 use JSONRPC_Client;
 use Spotman\Api\ApiException;
 use Spotman\Api\ApiMethodResponse;
+use Spotman\Api\ApiTypesHelper;
 
 class ApiClientJsonRpc extends ApiClientAbstract
 {
     /**
-     * @param string $resource
-     * @param string $method
-     * @param array  $arguments
+     * @param string                          $resource
+     * @param string                          $method
+     * @param array                           $arguments
+     *
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return ApiMethodResponse
      * @throws \Spotman\Api\ApiException
      */
-    public function remote_procedure_call(string $resource, string $method, array $arguments): ApiMethodResponse
-    {
-        $url    = $this->get_url();
+    public function remoteProcedureCall(
+        string $resource,
+        string $method,
+        array $arguments,
+        UserInterface $user
+    ): ApiMethodResponse {
+        $url    = $this->getUrl();
         $client = JSONRPC_Client::factory();
 
         try {
@@ -29,5 +37,19 @@ class ApiClientJsonRpc extends ApiClientAbstract
         $lastModified = $client->get_last_modified();
 
         return ApiMethodResponse::factory($data, $lastModified);
+    }
+
+    /**
+     * @deprecated Move to ApiHelper and exclude url creating logic to controller
+     * @return string
+     */
+    private function getUrl(): string
+    {
+        $relativeUrl = \Route::url('api', [
+            'version' => $this->version,
+            'type'    => ApiTypesHelper::typeToUrlKey($this->type),
+        ]);
+
+        return $this->host.$relativeUrl;
     }
 }

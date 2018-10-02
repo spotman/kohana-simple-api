@@ -38,7 +38,7 @@ class ApiResourceProxyFactory
      * @param string $modelName
      *
      * @return \Spotman\Api\ApiResourceProxyInterface
-     * @throws \Spotman\Api\ApiModelProxyException
+     * @throws \Spotman\Api\ApiResourceProxyException
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function createFromType(int $type, string $modelName): ApiResourceProxyInterface
@@ -52,12 +52,12 @@ class ApiResourceProxyFactory
      * @param $type
      *
      * @return string
-     * @throws \Spotman\Api\ApiModelProxyException
+     * @throws \Spotman\Api\ApiResourceProxyException
      */
     protected function getNameFromType($type): string
     {
         if (!isset($this->typeToName[$type])) {
-            throw new ApiModelProxyException('Invalid proxy type :value', [':value' => $type]);
+            throw new ApiResourceProxyException('Invalid proxy type :value', [':value' => $type]);
         }
 
         return $this->typeToName[$type];

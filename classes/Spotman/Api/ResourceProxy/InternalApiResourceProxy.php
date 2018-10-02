@@ -1,21 +1,17 @@
 <?php
 namespace Spotman\Api\ResourceProxy;
 
+use BetaKiller\Model\UserInterface;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory;
-use Spotman\Api\ApiFacade;
 use Spotman\Api\ApiAccessViolationException;
 use Spotman\Api\ApiMethodFactory;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\ApiMethodsCollectionInterface;
-use Spotman\Api\ApiModelInterface;
-use Spotman\Api\ApiModelProxyException;
-use Spotman\Api\ApiModelWithoutPermissionsInterface;
 use Spotman\Api\ApiResourceFactory;
 
 class InternalApiResourceProxy extends AbstractApiResourceProxy
 {
     /**
-     * @var ApiModelInterface|ApiMethodsCollectionInterface
+     * @var \Spotman\Api\ApiResourceInterface
      */
     protected $resourceInstance;
 
@@ -53,94 +49,33 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
     }
 
     /**
-     * @param string $methodName
-     * @param array  $arguments
+     * @param string                          $methodName
+     * @param array                           $arguments
+     *
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \Spotman\Api\ApiMethodResponse
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \Spotman\Api\ApiModelProxyException
      * @throws \Spotman\Api\ApiAccessViolationException
      */
-    protected function callResourceMethod(string $methodName, array $arguments): ?ApiMethodResponse
+    protected function callResourceMethod(string $methodName, array $arguments, UserInterface $user): ?ApiMethodResponse
     {
-        if ($this->resourceInstance instanceof ApiMethodsCollectionInterface) {
-            $response = $this->callMethodsCollectionMethod($this->resourceInstance, $methodName, $arguments);
-        } else {
-            $response = $this->callApiModelMethod($this->resourceInstance, $methodName, $arguments);
-        }
+        $resource = $this->resourceInstance;
 
-        return $response;
-    }
-
-    /**
-     * @param \Spotman\Api\ApiMethodsCollectionInterface $collection
-     * @param string                                     $methodName
-     * @param array                                      $arguments
-     *
-     * @return null|\Spotman\Api\ApiMethodResponse
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \Spotman\Api\ApiAccessViolationException
-     */
-    protected function callMethodsCollectionMethod(
-        ApiMethodsCollectionInterface $collection,
-        string $methodName,
-        array $arguments
-    ): ?ApiMethodResponse {
-        // Creating method instance
-        $methodInstance = $this->methodFactory->createMethod($collection->getName(), $methodName, $arguments);
+        // Creating method instance (inject current user in ApiMethod)
+        $methodInstance = $this->methodFactory->createMethod($resource->getName(), $methodName, $arguments, $user);
 
         // Getting method access resolver
         $resolverInstance = $this->accessResolverFactory->createFromApiMethod($methodInstance);
 
         // Security check
-        if (!$resolverInstance->isMethodAllowed($methodInstance)) {
+        if (!$resolverInstance->isMethodAllowed($methodInstance, $user)) {
             throw new ApiAccessViolationException('Access denied to :collection.:method', [
-                ':collection' => $collection->getName(),
+                ':collection' => $resource->getName(),
                 ':method'     => $methodName,
             ]);
         }
 
         return $methodInstance->execute();
-    }
-
-    /**
-     * @param \Spotman\Api\ApiModelInterface $model
-     * @param string                         $methodName
-     * @param array                          $arguments
-     *
-     * @return ApiMethodResponse
-     * @throws \Spotman\Api\ApiModelProxyException
-     * @throws \Spotman\Api\ApiAccessViolationException
-     */
-    protected function callApiModelMethod(
-        ApiModelInterface $model,
-        string $methodName,
-        array $arguments
-    ): ?ApiMethodResponse {
-        $this->checkModelPermissions();
-
-        if (!\is_callable([$model, $methodName])) {
-            throw new ApiModelProxyException('Unknown method :method in proxy object :class', [
-                ':method' => $methodName,
-                ':class'  => \get_class($model),
-            ]);
-        }
-
-        $arguments = ApiFacade::prepareNamedArguments($model, $methodName, $arguments);
-
-        return \call_user_func_array([$model, $methodName], $arguments);
-    }
-
-    /**
-     * @throws \Spotman\Api\ApiAccessViolationException
-     */
-    protected function checkModelPermissions()
-    {
-        // Skip models without permissions
-        if ($this->resourceInstance instanceof ApiModelWithoutPermissionsInterface) {
-            return;
-        }
-
-        throw new ApiAccessViolationException('ApiModel must not have external permissions, use methods collections instead');
     }
 }

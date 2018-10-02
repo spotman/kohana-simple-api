@@ -67,10 +67,10 @@ class ApiFacade
 
         $namedArguments = [];
 
-        $reflection = new \ReflectionClass($classNameOrObject);
-        $parameters = $reflection->getMethod($methodName)->getParameters();
+        $reflection       = new \ReflectionClass($classNameOrObject);
+        $reflectionMethod = $reflection->getMethod($methodName);
 
-        foreach ($parameters as $param) {
+        foreach ($reflectionMethod->getParameters() as $param) {
             $position = $param->getPosition();
 
             if (array_key_exists($position, $requestArguments)) {
@@ -88,8 +88,8 @@ class ApiFacade
                 }
 
                 throw new ApiException('Missing parameter :name for :class:::method', [
-                    ':name' => $param->getName(),
-                    ':class' => $reflection->getName(),
+                    ':name'   => $param->getName(),
+                    ':class'  => $reflection->getName(),
                     ':method' => $methodName,
                 ]);
             }
@@ -117,7 +117,7 @@ class ApiFacade
      * @param int|null $proxyType    Const ApiResourceProxyInterface::INTERNAL or ApiResourceProxyInterface::EXTERNAL
      *
      * @return \Spotman\Api\ApiResourceProxyInterface
-     * @throws \Spotman\Api\ApiModelProxyException
+     * @throws \Spotman\Api\ApiResourceProxyException
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function get(string $resourceName, ?int $proxyType = null): ApiResourceProxyInterface
@@ -136,7 +136,7 @@ class ApiFacade
      * @param string $resourceName
      *
      * @return \Spotman\Api\ApiResourceProxyInterface
-     * @throws \Spotman\Api\ApiModelProxyException
+     * @throws \Spotman\Api\ApiResourceProxyException
      * @throws \BetaKiller\Factory\FactoryException
      */
     private function createResourceProxy(int $type, string $resourceName): ApiResourceProxyInterface

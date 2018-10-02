@@ -1,6 +1,7 @@
 <?php
 namespace Spotman\Api\ResourceProxy;
 
+use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiClientFactory;
 use Spotman\Api\ApiMethodResponse;
 
@@ -25,16 +26,18 @@ class ExternalApiResourceProxy extends AbstractApiResourceProxy
     }
 
     /**
-     * @param string $methodName
-     * @param array  $arguments
+     * @param string                                   $methodName
+     * @param array                                    $arguments
+     *
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \Spotman\Api\ApiMethodResponse
      * @throws \Spotman\Api\ApiException
      */
-    protected function callResourceMethod(string $methodName, array $arguments): ?ApiMethodResponse
+    protected function callResourceMethod(string $methodName, array $arguments, UserInterface $user): ?ApiMethodResponse
     {
         $client = $this->clientFactory->createDefault();
 
-        return $client->remote_procedure_call($this->resourceName, $methodName, $arguments);
+        return $client->remoteProcedureCall($this->resourceName, $methodName, $arguments, $user);
     }
 }

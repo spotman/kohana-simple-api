@@ -1,8 +1,9 @@
 <?php
 namespace Spotman\Api\ResourceProxy;
 
+use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\ApiModelProxyException;
+use Spotman\Api\ApiResourceProxyException;
 use Spotman\Api\ApiResourceProxyInterface;
 
 abstract class AbstractApiResourceProxy implements ApiResourceProxyInterface
@@ -23,33 +24,19 @@ abstract class AbstractApiResourceProxy implements ApiResourceProxyInterface
     }
 
     /**
-     * @param string $methodName
-     * @param array  $arguments
-     *
-     * @return ApiMethodResponse
-     * @throws \Spotman\Api\ApiMethodException
-     * @throws \Spotman\Api\ApiModelProxyException
-     * @throws \Spotman\Api\ApiAccessViolationException
-     */
-    final public function __call($methodName, $arguments): ApiMethodResponse
-    {
-        return $this->call($methodName, $arguments);
-    }
-
-    /**
      * Simple proxy call to model method
      *
-     * @param string $methodName
-     * @param array  $arguments
+     * @param string                                   $methodName
+     * @param array                                    $arguments
+     *
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \Spotman\Api\ApiMethodResponse Result of the API call
-     * @throws \Spotman\Api\ApiMethodException
-     * @throws \Spotman\Api\ApiAccessViolationException
-     * @throws \Spotman\Api\ApiModelProxyException
+     * @throws \Spotman\Api\ApiResourceProxyException
      */
-    final public function call(string $methodName, array $arguments): ApiMethodResponse
+    final public function call(string $methodName, array $arguments, UserInterface $user): ApiMethodResponse
     {
-        $response = $this->callResourceMethod($methodName, $arguments);
+        $response = $this->callResourceMethod($methodName, $arguments, $user);
 
         // For methods with empty response
         if ($response === null) {
@@ -57,7 +44,7 @@ abstract class AbstractApiResourceProxy implements ApiResourceProxyInterface
         }
 
         if (!($response instanceof ApiMethodResponse)) {
-            throw new ApiModelProxyException('Api model method [:model.:method] must return :must or null', [
+            throw new ApiResourceProxyException('Api model method [:model.:method] must return :must or null', [
                 ':model'  => $this->resourceName,
                 ':method' => $methodName,
                 ':must'   => ApiMethodResponse::class,
@@ -68,11 +55,11 @@ abstract class AbstractApiResourceProxy implements ApiResourceProxyInterface
     }
 
     /**
-     * @param string $methodName
-     * @param array  $arguments
+     * @param string                          $methodName
+     * @param array                           $arguments
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \Spotman\Api\ApiMethodResponse
-     * @throws \Spotman\Api\ApiAccessViolationException
      */
-    abstract protected function callResourceMethod(string $methodName, array $arguments): ?ApiMethodResponse;
+    abstract protected function callResourceMethod(string $methodName, array $arguments, UserInterface $user): ?ApiMethodResponse;
 }

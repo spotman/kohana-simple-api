@@ -2,6 +2,7 @@
 namespace Spotman\Api;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Model\UserInterface;
 
 class ApiMethodFactory
 {
@@ -27,16 +28,20 @@ class ApiMethodFactory
     }
 
     /**
-     * @param string $collectionName
-     * @param string $methodName
-     * @param array  $arguments
+     * @param string                          $collectionName
+     * @param string                          $methodName
+     * @param array                           $arguments
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return ApiMethodInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createMethod($collectionName, $methodName, array $arguments): ApiMethodInterface
+    public function createMethod(string $collectionName, string $methodName, array $arguments, UserInterface $user): ApiMethodInterface
     {
         $this->factory->setClassNamespaces('Api', 'Method', ucfirst($collectionName));
+
+        // Inject current user into ApiMethod constructor
+        $arguments['user'] = $user;
 
         return $this->factory->create(ucfirst($methodName), $arguments);
     }

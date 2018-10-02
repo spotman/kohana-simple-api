@@ -1,8 +1,6 @@
 <?php
 namespace Spotman\Api\Client;
 
-use Route;
-use Spotman\Api\ApiTypesHelper;
 use Spotman\Api\ApiClientInterface;
 
 abstract class ApiClientAbstract implements ApiClientInterface
@@ -22,24 +20,10 @@ abstract class ApiClientAbstract implements ApiClientInterface
      */
     protected $version;
 
-    public function __construct($type, $host, $version)
+    public function __construct(int $type, string $host, int $version)
     {
         $this->type    = $type;
         $this->host    = $host;
         $this->version = $version;
-    }
-
-    /**
-     * @deprecated Move to ApiHelper and exclude url creating logic to controller
-     * @return string
-     */
-    public function get_url()
-    {
-        $relative_url = Route::url('api', [
-            'version' => $this->version,
-            'type'    => ApiTypesHelper::typeToUrlKey($this->type),
-        ]);
-
-        return $this->host . $relative_url;
     }
 }
