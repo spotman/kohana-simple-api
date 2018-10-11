@@ -45,11 +45,12 @@ class ApiClientJsonRpc extends ApiClientAbstract
      */
     private function getUrl(): string
     {
-        $relativeUrl = \Route::url('api', [
-            'version' => $this->version,
-            'type'    => ApiTypesHelper::typeToUrlKey($this->type),
-        ]);
-
-        return $this->host.$relativeUrl;
+        throw new \LogicException('Deprecated');
+//        $relativeUrl = \Route::url('api', [
+//            'version' => $this->version,
+//            'type'    => ApiTypesHelper::typeToUrlKey($this->type),
+//        ]);
+//
+//        return $this->host.$relativeUrl;
     }
 }

@@ -1,19 +1,18 @@
 <?php
 namespace Spotman\Api;
 
-use DateTime;
 use Traversable;
 
-class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
+final class ApiMethodResponse
 {
-    protected $data;
+    private $data;
 
     /**
-     * @var DateTime Timestamp of the last change
+     * @var \DateTimeImmutable Timestamp of the last change
      */
-    protected $lastModified;
+    private $lastModified;
 
-    protected static $allowedResultTypes = [
+    private static $allowedResultTypes = [
         'null',
         'boolean',
         'string',
@@ -22,36 +21,49 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     ];
 
     /**
-     * @param null                    $data
-     * @param \DateTimeInterface|null $lastModified
+     * @param mixed|null         $data
+     * @param \DateTimeImmutable $lastModified
      *
      * @return \Spotman\Api\ApiMethodResponse
      */
-    public static function factory($data = null, \DateTimeInterface $lastModified = null): ApiMethodResponse
+    public static function factory($data = null, \DateTimeImmutable $lastModified = null): ApiMethodResponse
     {
-        $obj = new static;
-
-        $obj->setData($data);
-
-        if ($lastModified) {
-            $obj->setLastModified($lastModified);
-        }
-
-        return $obj;
+        return new self($data, $lastModified);
     }
 
     /**
-     * @param mixed $data
+     * @param array $input
      *
      * @return \Spotman\Api\ApiMethodResponse
      * @throws \Spotman\Api\ApiMethodException
+     * @throws \Spotman\Api\ApiResponseException
      */
-    public function setData($data): ApiMethodResponse
+    public static function fromArray(array $input): ApiMethodResponse
+    {
+        $data = $input['data'] ?? null;
+
+        $timestamp = $input['last_modified'] ?? null;
+
+        if (!$timestamp) {
+            throw new ApiResponseException('Last modified time is missing');
+        }
+
+        $lastModified = (new \DateTimeImmutable)->setTimestamp($timestamp);
+
+        return new self($data, $lastModified);
+    }
+
+    /**
+     * ApiMethodResponse constructor.
+     *
+     * @param                    $data
+     * @param \DateTimeImmutable $lastModified
+     */
+    public function __construct($data = null, \DateTimeImmutable $lastModified = null)
     {
         // Cleanup data and cast it to array structures and scalar types
-        $this->data = $this->convertResult($data);
-
-        return $this;
+        $this->data         = $this->convertResult($data);
+        $this->lastModified = $lastModified ?? new \DateTimeImmutable;
     }
 
     /**
@@ -63,47 +75,11 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     }
 
     /**
-     * @param \DateTimeInterface $lastModified
-     *
-     * @return $this
+     * @return \DateTimeImmutable
      */
-    public function setLastModified(\DateTimeInterface $lastModified): ApiMethodResponse
+    public function getLastModified(): \DateTimeImmutable
     {
-        $this->lastModified = $lastModified;
-
-        return $this;
-    }
-
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getLastModified(): \DateTimeInterface
-    {
-        return $this->lastModified ?: new \DateTimeImmutable;
-    }
-
-    /**
-     * @param array $input
-     *
-     * @return \Spotman\Api\ApiMethodResponse
-     * @throws \Spotman\Api\ApiMethodException
-     * @throws \Spotman\Api\ApiResponseException
-     */
-    public function fromArray(array $input): ApiMethodResponse
-    {
-        $data = $input['data'] ?? null;
-
-        $lastModifiedTimestamp = $input['last_modified'] ?? null;
-
-        if (!$lastModifiedTimestamp) {
-            throw new ApiResponseException('Last modified time is missing');
-        }
-
-        $lastModifiedObject = (new \DateTimeImmutable)->setTimestamp($lastModifiedTimestamp);
-
-        return $this
-            ->setData($data)
-            ->setLastModified($lastModifiedObject);
+        return $this->lastModified;
     }
 
     /**
@@ -117,23 +93,7 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
         ];
     }
 
-    /**
-     * @return mixed
-     */
-    public function getJsonRpcResponseData()
-    {
-        return $this->getData();
-    }
-
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getJsonRpcResponseLastModified(): ?\DateTimeInterface
-    {
-        return $this->getLastModified();
-    }
-
-    protected function processLastModified(\DateTimeInterface $newLastModified): void
+    private function processLastModified(\DateTimeImmutable $newLastModified): void
     {
         if ($this->lastModified && $newLastModified > $this->lastModified) {
             $this->lastModified = $newLastModified;
@@ -141,12 +101,12 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
     }
 
     /**
-     * @param $modelCallResult
+     * @param mixed $modelCallResult
      *
      * @return array|int|string|bool|double|null
      * @throws \Spotman\Api\ApiMethodException
      */
-    protected function convertResult($modelCallResult)
+    private function convertResult($modelCallResult)
     {
         if (\is_object($modelCallResult)) {
             return $this->convertResultObject($modelCallResult);
@@ -165,7 +125,7 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
      * @return int|string|array
      * @throws ApiMethodException
      */
-    protected function convertResultObject($object)
+    private function convertResultObject($object)
     {
         if ($object instanceof \JsonSerializable) {
             return $object->jsonSerialize();
@@ -197,7 +157,7 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
      * @return array
      * @throws \Spotman\Api\ApiMethodException
      */
-    protected function convertResultTraversable($traversable): array
+    private function convertResultTraversable($traversable): array
     {
         $data = [];
 
@@ -214,7 +174,7 @@ class ApiMethodResponse implements \JSONRPC_ModelResponseInterface
      * @return mixed
      * @throws \Spotman\Api\ApiMethodException
      */
-    protected function convertResultSimple($data)
+    private function convertResultSimple($data)
     {
         $type = \gettype($data);
 
