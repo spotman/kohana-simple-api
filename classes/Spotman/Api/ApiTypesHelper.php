@@ -1,15 +1,21 @@
 <?php
 namespace Spotman\Api;
 
-class ApiTypesHelper
+final class ApiTypesHelper
 {
-    const JSON_RPC = 1;
+    public const JSON_RPC = 1;
 
-    protected static $typeToName = [
+    /**
+     * @var string[]
+     */
+    private static $typeToName = [
         self::JSON_RPC => 'JsonRpc',
     ];
 
-    protected static $typeToUrlKey = [
+    /**
+     * @var string[]
+     */
+    private static $typeToUrlKey = [
         self::JSON_RPC => 'json-rpc',
     ];
 
@@ -17,9 +23,9 @@ class ApiTypesHelper
      * @param int $itemType
      *
      * @return string
-     * @throws ApiException
+     * @throws \Spotman\Api\ApiException
      */
-    public static function typeToName($itemType)
+    public static function typeToName(int $itemType): string
     {
         if (!isset(static::$typeToName[$itemType])) {
             throw new ApiException('Undefined type :type', [':type' => $itemType]);
@@ -28,7 +34,13 @@ class ApiTypesHelper
         return static::$typeToName[$itemType];
     }
 
-    public static function typeToUrlKey($itemType)
+    /**
+     * @param int $itemType
+     *
+     * @return string
+     * @throws \Spotman\Api\ApiException
+     */
+    public static function typeToUrlKey(int $itemType): string
     {
         if (!isset(static::$typeToUrlKey[$itemType])) {
             throw new ApiException('Undefined type: :type', [':type' => $itemType]);
@@ -37,7 +49,13 @@ class ApiTypesHelper
         return static::$typeToUrlKey[$itemType];
     }
 
-    public static function urlKeyToType($itemUrlKey)
+    /**
+     * @param $itemUrlKey
+     *
+     * @return int
+     * @throws \Spotman\Api\ApiException
+     */
+    public static function urlKeyToType(string $itemUrlKey): int
     {
         foreach (static::$typeToUrlKey as $type => $key) {
             if ($itemUrlKey === $key) {
@@ -48,7 +66,7 @@ class ApiTypesHelper
         throw new ApiException('Unknown url key: :key', [':key' => $itemUrlKey]);
     }
 
-    public static function nameToType($itemName)
+    public static function nameToType(string $itemName): int
     {
         foreach (static::$typeToName as $type => $key) {
             if ($itemName === $key) {

@@ -18,11 +18,6 @@ class ApiFacade
     protected $proxyFactory;
 
     /**
-     * @var \Spotman\Api\ApiServerFactory
-     */
-    protected $serverFactory;
-
-    /**
      * @var \BetaKiller\Config\ConfigProviderInterface
      */
     private $configProvider;
@@ -31,16 +26,13 @@ class ApiFacade
      * API constructor.
      *
      * @param \Spotman\Api\ApiResourceProxyFactory       $proxyFactory
-     * @param \Spotman\Api\ApiServerFactory              $serverFactory
      * @param \BetaKiller\Config\ConfigProviderInterface $configProvider
      */
     public function __construct(
         ApiResourceProxyFactory $proxyFactory,
-        ApiServerFactory $serverFactory,
         ConfigProviderInterface $configProvider
     ) {
         $this->proxyFactory   = $proxyFactory;
-        $this->serverFactory  = $serverFactory;
         $this->configProvider = $configProvider;
     }
 
@@ -96,20 +88,6 @@ class ApiFacade
         }
 
         return $namedArguments;
-    }
-
-    /**
-     * API server factory
-     *
-     * @param integer|null $type Transport type constant like ApiTypesHelper::JSON_RPC
-     * @param              $version
-     *
-     * @return \Spotman\Api\ApiServerInterface
-     * @throws \Spotman\Api\ApiException
-     */
-    public function createServer($type, $version): ApiServerInterface
-    {
-        return $this->serverFactory->createApiServerByType($type, $version);
     }
 
     /**

@@ -1,31 +1,36 @@
 <?php
 namespace Spotman\Api\Server;
 
-use JSONRPC_Server;
-use Request;
-use Response;
-use Spotman\Api\ApiFacade;
-use Spotman\Api\ApiAccessViolationException;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Spotman\Api\JsonRpc\JsonRpcServer;
 
 class ApiServerJsonRpc extends ApiServerAbstract
 {
     /**
+     * @var \Spotman\Api\JsonRpc\JsonRpcServer
+     */
+    private $server;
+
+    /**
+     * ApiServerJsonRpc constructor.
+     *
+     * @param \Spotman\Api\JsonRpc\JsonRpcServer $server
+     */
+    public function __construct(JsonRpcServer $server)
+    {
+        $this->server = $server;
+    }
+
+    /**
      * Process API request and push data to $response
      *
-     * @param \Spotman\Api\ApiFacade $api
-     * @param Request                $request
-     * @param Response               $response
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function process(ApiFacade $api, \Request $request, \Response $response): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $server = JSONRPC_Server::factory($response);
-
-        $server->add_access_violation_exception(ApiAccessViolationException::class);
-
-        $server->register_proxy_factory(function (string $resourceName) use ($api) {
-            return $api->get($resourceName);
-        });
-
-        $server->process($request->body());
+        return $this->server->handle($request);
     }
 }

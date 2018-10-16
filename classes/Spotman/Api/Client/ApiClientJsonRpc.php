@@ -2,12 +2,12 @@
 namespace Spotman\Api\Client;
 
 use BetaKiller\Model\UserInterface;
-use JSONRPC_Client;
 use Spotman\Api\ApiException;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\ApiTypesHelper;
+use Spotman\Api\JsonRpc\JsonRpcClient;
+use Spotman\Api\Route;
 
-class ApiClientJsonRpc extends ApiClientAbstract
+final class ApiClientJsonRpc extends ApiClientAbstract
 {
     /**
      * @param string                          $resource
@@ -26,31 +26,24 @@ class ApiClientJsonRpc extends ApiClientAbstract
         UserInterface $user
     ): ApiMethodResponse {
         $url    = $this->getUrl();
-        $client = JSONRPC_Client::factory();
+        $client = JsonRpcClient::factory();
 
         try {
-            $data = $client->call($url, $resource.'.'.$method, $arguments);
+            $response = $client->call($url, $resource.'.'.$method, $arguments);
+
+            return ApiMethodResponse::factory($response->getData(), $response->getLastModified());
         } catch (\Throwable $e) {
             throw new ApiException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
         }
-
-        $lastModified = $client->get_last_modified();
-
-        return ApiMethodResponse::factory($data, $lastModified);
     }
 
     /**
-     * @deprecated Move to ApiHelper and exclude url creating logic to controller
      * @return string
      */
     private function getUrl(): string
     {
-        throw new \LogicException('Deprecated');
-//        $relativeUrl = \Route::url('api', [
-//            'version' => $this->version,
-//            'type'    => ApiTypesHelper::typeToUrlKey($this->type),
-//        ]);
-//
-//        return $this->host.$relativeUrl;
+        $route = new Route($this->version, $this->type);
+
+        return $this->host.$route;
     }
 }
