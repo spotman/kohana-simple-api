@@ -2,6 +2,7 @@
 namespace Spotman\Api;
 
 use BetaKiller\Config\ConfigProviderInterface;
+use Psr\Container\ContainerInterface;
 
 class ApiServerFactory
 {
@@ -11,13 +12,20 @@ class ApiServerFactory
     private $configProvider;
 
     /**
+     * @var \Psr\Container\ContainerInterface
+     */
+    private $container;
+
+    /**
      * ApiServerFactory constructor.
      *
      * @param \BetaKiller\Config\ConfigProviderInterface $configProvider
+     * @param \Psr\Container\ContainerInterface          $container
      */
-    public function __construct(ConfigProviderInterface $configProvider)
+    public function __construct(ConfigProviderInterface $configProvider, ContainerInterface $container)
     {
         $this->configProvider = $configProvider;
+        $this->container      = $container;
     }
 
     /**
@@ -51,11 +59,7 @@ class ApiServerFactory
 
         // TODO Deal with version
 
-        if (!class_exists($className)) {
-            throw new ApiException('Can not find API server for :name', [':name' => $name]);
-        }
-
-        $server = new $className;
+        $server = $this->container->get($className);
 
         if (!($server instanceof ApiServerInterface)) {
             throw new ApiException('Class :class must implement :interface', [

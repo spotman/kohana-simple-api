@@ -60,9 +60,7 @@ class ApiFacade
         $namedArguments = [];
 
         $reflection       = new \ReflectionClass($classNameOrObject);
-        $reflectionMethod = $reflection->getMethod($methodName);
-
-        foreach ($reflectionMethod->getParameters() as $param) {
+        foreach ($reflection->getMethod($methodName)->getParameters() as $param) {
             $position = $param->getPosition();
 
             if (array_key_exists($position, $requestArguments)) {

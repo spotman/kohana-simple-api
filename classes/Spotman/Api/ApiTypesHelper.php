@@ -28,7 +28,7 @@ final class ApiTypesHelper
     public static function typeToName(int $itemType): string
     {
         if (!isset(static::$typeToName[$itemType])) {
-            throw new ApiException('Undefined type :type', [':type' => $itemType]);
+            throw new ApiException('Undefined type ":type"', [':type' => $itemType]);
         }
 
         return static::$typeToName[$itemType];
@@ -43,7 +43,7 @@ final class ApiTypesHelper
     public static function typeToUrlKey(int $itemType): string
     {
         if (!isset(static::$typeToUrlKey[$itemType])) {
-            throw new ApiException('Undefined type: :type', [':type' => $itemType]);
+            throw new ApiException('Undefined type: ":type"', [':type' => $itemType]);
         }
 
         return static::$typeToUrlKey[$itemType];
@@ -63,7 +63,7 @@ final class ApiTypesHelper
             }
         }
 
-        throw new ApiException('Unknown url key: :key', [':key' => $itemUrlKey]);
+        throw new ApiException('Unknown url key ":key"', [':key' => $itemUrlKey]);
     }
 
     public static function nameToType(string $itemName): int
@@ -74,6 +74,6 @@ final class ApiTypesHelper
             }
         }
 
-        throw new ApiException('Unknown name: :name', [':name' => $itemName]);
+        throw new ApiException('Unknown name ":name"', [':name' => $itemName]);
     }
 }

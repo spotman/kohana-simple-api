@@ -4,6 +4,8 @@ namespace Spotman\Api\JsonRpc;
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Model\UserInterface;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -12,28 +14,17 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionMethod;
+use Spotman\Api\ApiAccessViolationException;
+use Spotman\Api\ApiFacade;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\JsonRpc\Exception\HttpJsonRpcException;
 use Spotman\Api\JsonRpc\Exception\InternalErrorJsonRpcException;
-use Spotman\Api\JsonRpc\Exception\InvalidParamsJsonRpcException;
 use Spotman\Api\JsonRpc\Exception\InvalidRequestJsonRpcException;
-use Spotman\Api\JsonRpc\Exception\MethodNotFoundJsonRpcException;
 use Throwable;
 
 final class JsonRpcServer implements RequestHandlerInterface
 {
     use LoggerHelperTrait;
-
-    /**
-     * @var callable
-     */
-    private $proxyFactoryCallable;
-
-    /**
-     * @var string[]
-     */
-    private $accessViolationExceptions;
 
     /**
      * @var ResponseFactoryInterface
@@ -45,35 +36,16 @@ final class JsonRpcServer implements RequestHandlerInterface
      */
     private $logger;
 
-    public function __construct(ResponseFactoryInterface $responseFactory, LoggerInterface $logger)
+    /**
+     * @var \Spotman\Api\ApiFacade
+     */
+    private $api;
+
+    public function __construct(ApiFacade $api, ResponseFactoryInterface $responseFactory, LoggerInterface $logger)
     {
+        $this->api             = $api;
         $this->responseFactory = $responseFactory;
-
-        $this->registerProxyFactory([$this, 'defaultProxyFactory']);
-        $this->logger = $logger;
-    }
-
-    public function registerProxyFactory(callable $factory)
-    {
-        $this->proxyFactoryCallable = $factory;
-
-        return $this;
-    }
-
-    public function addAccessViolationException(string $className)
-    {
-        $this->accessViolationExceptions[] = $className;
-
-        return $this;
-    }
-
-    public function defaultProxyFactory(string $className)
-    {
-        if (!class_exists($className)) {
-            throw new MethodNotFoundJsonRpcException;
-        }
-
-        return new $className;
+        $this->logger          = $logger;
     }
 
     public function handle(ServerRequestInterface $httpRequest): ResponseInterface
@@ -82,14 +54,17 @@ final class JsonRpcServer implements RequestHandlerInterface
         $lastModified = null;
 
         try {
-            $rawBody = $httpRequest->getParsedBody();
+            $rawBody = $httpRequest->getBody()->getContents();
 
             if (!$rawBody) {
                 throw new InvalidRequestJsonRpcException;
             }
 
-            if (\is_array($rawBody)) {
-                $batchData    = $this->processBatch($rawBody);
+            $body = \json_decode($rawBody);
+            $user = ServerRequestHelper::getUser($httpRequest);
+
+            if (\is_array($body)) {
+                $batchData    = $this->processBatch($body, $user);
                 $batchResults = [];
 
                 // Update last modified for each item
@@ -100,8 +75,10 @@ final class JsonRpcServer implements RequestHandlerInterface
 
                 $rpcResponse = '['.implode(',', array_filter($batchResults)).']';
             } else {
-                $request      = new JsonRpcServerRequest($rawBody);
-                $data         = $this->processRequest($request);
+                $request = new JsonRpcServerRequest($body);
+
+                $data = $this->processRequest($request, $user);
+
                 $lastModified = $this->updateLastModified($lastModified, $data->getLastModified());
                 $rpcResponse  = $data->body();
             }
@@ -110,7 +87,7 @@ final class JsonRpcServer implements RequestHandlerInterface
 
             $e = $this->wrapException($e);
 
-            $rpcResponse = ServerResponse::factory()->failed($e)->body();
+            $rpcResponse = JsonRpcServerResponse::factory()->failed($e)->body();
         }
 
         // Send response
@@ -119,44 +96,42 @@ final class JsonRpcServer implements RequestHandlerInterface
 
     private function isAccessViolationException(\Throwable $e): bool
     {
-        foreach ($this->accessViolationExceptions as $violationException) {
-            if ($e instanceof $violationException) {
-                return true;
-            }
-        }
-
-        return false;
+        return $e instanceof ApiAccessViolationException;
     }
 
     /**
-     * @param array $batchRequest
+     * @param array                           $batchRequest
      *
-     * @return \Spotman\Api\JsonRpc\ServerResponse[]
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return \Spotman\Api\JsonRpc\JsonRpcServerResponse[]
      * @throws \Spotman\Api\JsonRpc\Exception\InvalidRequestJsonRpcException
-     * @throws \Spotman\Api\JsonRpc\JsonRpcException
      */
-    private function processBatch(array $batchRequest): array
+    private function processBatch(array $batchRequest, UserInterface $user): array
     {
         $results = [];
 
         // Process each request
         foreach ($batchRequest as $subRequest) {
             $request   = new JsonRpcServerRequest($subRequest);
-            $results[] = $this->processRequest($request);
+            $results[] = $this->processRequest($request, $user);
         }
 
         return array_filter($results);
     }
 
     /**
-     * @param JsonRpcServerRequest $request
+     * @param JsonRpcServerRequest            $request
      *
-     * @return \Spotman\Api\JsonRpc\ServerResponse
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return \Spotman\Api\JsonRpc\JsonRpcServerResponse
+     * @throws \Exception
      */
-    private function processRequest(JsonRpcServerRequest $request): ServerResponse
+    private function processRequest(JsonRpcServerRequest $request, UserInterface $user): JsonRpcServerResponse
     {
         // Make response
-        $response = ServerResponse::factory()->setId($request->getId());
+        $response = JsonRpcServerResponse::factory()->setId($request->getId());
 
         $lastModified = new DateTimeImmutable;
 
@@ -165,13 +140,10 @@ final class JsonRpcServer implements RequestHandlerInterface
             $resourceName = $request->getResourceName();
             $methodName   = $request->getMethodName();
 
-            // Factory proxy object
-            $proxyObject = $this->proxyFactory($resourceName);
-
-            $params = $this->prepareParams($proxyObject, $methodName, $request->getParams() ?: []);
-
             // Call proxy object method
-            $result = \call_user_func_array([$proxyObject, $methodName], $params);
+            $result = $this->api
+                ->get($resourceName)
+                ->call($methodName, $request->getParams(), $user);
 
             if (\is_object($result) && $result instanceof ApiMethodResponse) {
                 $lastModified = $result->getLastModified();
@@ -207,39 +179,6 @@ final class JsonRpcServer implements RequestHandlerInterface
         }
 
         return $e;
-    }
-
-    private function proxyFactory(string $className)
-    {
-        return \call_user_func($this->proxyFactoryCallable, $className);
-    }
-
-    private function prepareParams($proxyObject, string $methodName, array $args): array
-    {
-        if (!$args) {
-            return $args;
-        }
-
-        // Thru indexed params
-        if (\is_int(key($args))) {
-            return $args;
-        }
-
-        $reflection = new ReflectionMethod($proxyObject, $methodName);
-
-        $params = [];
-
-        foreach ($reflection->getParameters() as $param) {
-            if (isset($args[$param->getName()])) {
-                $params[] = $args[$param->getName()];
-            } elseif ($param->isDefaultValueAvailable()) {
-                $params[] = $param->getDefaultValue();
-            } else {
-                throw new InvalidParamsJsonRpcException;
-            }
-        }
-
-        return $params;
     }
 
     private function updateLastModified(?DateTimeImmutable $current, ?DateTimeImmutable $updated): DateTimeImmutable

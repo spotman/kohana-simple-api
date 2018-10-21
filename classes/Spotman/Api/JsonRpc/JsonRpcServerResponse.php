@@ -4,7 +4,7 @@ namespace Spotman\Api\JsonRpc;
 use DateTimeImmutable;
 use stdClass;
 
-final class ServerResponse
+final class JsonRpcServerResponse
 {
     /**
      * @var int

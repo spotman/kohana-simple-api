@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Spotman\Api\JsonRpc;
 
 use Spotman\Api\JsonRpc\Exception\InvalidRequestJsonRpcException;
@@ -23,7 +25,7 @@ final class JsonRpcServerRequest
     /**
      * @var array
      */
-    private $params;
+    private $params = [];
 
     /**
      * JsonRpcServerRequest constructor.
