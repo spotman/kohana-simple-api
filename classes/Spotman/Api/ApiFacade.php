@@ -37,7 +37,7 @@ class ApiFacade
     }
 
     /**
-     * @param        $classNameOrObject
+     * @param string $className
      * @param string $methodName
      * @param array  $requestArguments
      *
@@ -45,7 +45,7 @@ class ApiFacade
      * @throws \Spotman\Api\ApiException
      * @throws \ReflectionException
      */
-    public static function prepareNamedArguments($classNameOrObject, string $methodName, array $requestArguments): array
+    public static function prepareNamedArguments(string $className, string $methodName, array $requestArguments): array
     {
         // Skip calls without arguments
         if (!$requestArguments) {
@@ -59,7 +59,7 @@ class ApiFacade
 
         $namedArguments = [];
 
-        $reflection       = new \ReflectionClass($classNameOrObject);
+        $reflection = new \ReflectionClass($className);
         foreach ($reflection->getMethod($methodName)->getParameters() as $param) {
             $position = $param->getPosition();
 
@@ -96,7 +96,7 @@ class ApiFacade
      * @throws \Spotman\Api\ApiResourceProxyException
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function get(string $resourceName, ?int $proxyType = null): ApiResourceProxyInterface
+    public function getResource(string $resourceName, ?int $proxyType = null): ApiResourceProxyInterface
     {
         if ($proxyType === null) {
             $proxyType = (int)$this->configProvider->load(self::CONFIG_CLIENT_PROXY) ?: ApiResourceProxyInterface::INTERNAL;

@@ -142,7 +142,7 @@ final class JsonRpcServer implements RequestHandlerInterface
 
             // Call proxy object method
             $result = $this->api
-                ->get($resourceName)
+                ->getResource($resourceName)
                 ->call($methodName, $request->getParams(), $user);
 
             if (\is_object($result) && $result instanceof ApiMethodResponse) {

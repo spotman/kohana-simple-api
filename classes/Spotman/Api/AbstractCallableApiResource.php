@@ -35,7 +35,7 @@ abstract class AbstractCallableApiResource extends AbstractApiResource
     {
         // Forward call to API subsystem
         return $this->api
-            ->get($this->getName())
+            ->getResource($this->getName())
             ->call($methodName, $arguments, $user);
     }
 }
