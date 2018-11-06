@@ -37,59 +37,7 @@ class ApiFacade
     }
 
     /**
-     * @param string $className
-     * @param string $methodName
-     * @param array  $requestArguments
-     *
-     * @return array
-     * @throws \Spotman\Api\ApiException
-     * @throws \ReflectionException
-     */
-    public static function prepareNamedArguments(string $className, string $methodName, array $requestArguments): array
-    {
-        // Skip calls without arguments
-        if (!$requestArguments) {
-            return $requestArguments;
-        }
-
-        // Using named arguments already, skip processing
-        if (\is_string(key($requestArguments))) {
-            return $requestArguments;
-        }
-
-        $namedArguments = [];
-
-        $reflection = new \ReflectionClass($className);
-        foreach ($reflection->getMethod($methodName)->getParameters() as $param) {
-            $position = $param->getPosition();
-
-            if (array_key_exists($position, $requestArguments)) {
-                $key                  = $param->getName();
-                $namedArguments[$key] = $requestArguments[$position];
-            } elseif ($param->isOptional()) {
-                $key                  = $param->getName();
-                $namedArguments[$key] = $param->getDefaultValue();
-            } else {
-                $argType = $param->getType();
-
-                // Skip parameters with class type hint coz they would be injected from DI container
-                if ($argType && !$argType->isBuiltin()) {
-                    continue;
-                }
-
-                throw new ApiException('Missing parameter :name for :class:::method', [
-                    ':name'   => $param->getName(),
-                    ':class'  => $reflection->getName(),
-                    ':method' => $methodName,
-                ]);
-            }
-        }
-
-        return $namedArguments;
-    }
-
-    /**
-     * @param string   $resourceName API Model name
+     * @param string   $resourceName API resource name
      * @param int|null $proxyType    Const ApiResourceProxyInterface::INTERNAL or ApiResourceProxyInterface::EXTERNAL
      *
      * @return \Spotman\Api\ApiResourceProxyInterface

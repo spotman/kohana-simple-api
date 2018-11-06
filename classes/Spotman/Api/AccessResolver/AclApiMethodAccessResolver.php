@@ -6,6 +6,7 @@ use Spotman\Acl\AclInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodInterface;
+use Spotman\Api\ArgumentsInterface;
 
 class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
 {
@@ -28,16 +29,20 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
 
     /**
      * @param \Spotman\Api\ApiMethodInterface $method
+     * @param \Spotman\Api\ArgumentsInterface $arguments
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return bool
      * @throws \Spotman\Api\ApiMethodException
      */
-    public function isMethodAllowed(ApiMethodInterface $method, UserInterface $user): bool
-    {
+    public function isMethodAllowed(
+        ApiMethodInterface $method,
+        ArgumentsInterface $arguments,
+        UserInterface $user
+    ): bool {
         $resource = $this->getAclResourceFromApiMethod($method);
 
-        $this->acl->injectUserResolver($user, $resource);
+        $this->prepareResource($resource, $method, $arguments, $user);
 
         $aclPermissionName = $method->getName();
 
@@ -64,5 +69,19 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
         }
 
         return $resource;
+    }
+
+    protected function prepareResource(
+        ResolvingResourceInterface $resource,
+        ApiMethodInterface $method,
+        ArgumentsInterface $arguments,
+        UserInterface $user
+    ): void {
+        // Ugly workaround for using unused methods
+        if (!$method || !$arguments) {
+            throw new \LogicException('Api method and arguments must be defined');
+        }
+
+        $this->acl->injectUserResolver($user, $resource);
     }
 }

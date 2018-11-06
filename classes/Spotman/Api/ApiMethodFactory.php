@@ -2,7 +2,6 @@
 namespace Spotman\Api;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
-use BetaKiller\Model\UserInterface;
 
 class ApiMethodFactory
 {
@@ -21,28 +20,20 @@ class ApiMethodFactory
         $this->factory = $factoryBuilder
             ->createFactory()
             ->setClassSuffix(ApiMethodInterface::SUFFIX)
-            ->setExpectedInterface(ApiMethodInterface::class)
-            ->prepareArgumentsWith(function (array $arguments, string $className) {
-                return ApiFacade::prepareNamedArguments($className, '__construct', $arguments);
-            });
+            ->setExpectedInterface(ApiMethodInterface::class);
     }
 
     /**
-     * @param string                          $collectionName
-     * @param string                          $methodName
-     * @param array                           $arguments
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param string $collectionName
+     * @param string $methodName
      *
      * @return ApiMethodInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createMethod(string $collectionName, string $methodName, array $arguments, UserInterface $user): ApiMethodInterface
+    public function createMethod(string $collectionName, string $methodName): ApiMethodInterface
     {
         $this->factory->setClassNamespaces('Api', 'Method', ucfirst($collectionName));
 
-        // Inject current user into ApiMethod constructor
-        $arguments['user'] = $user;
-
-        return $this->factory->create(ucfirst($methodName), $arguments);
+        return $this->factory->create(ucfirst($methodName));
     }
 }

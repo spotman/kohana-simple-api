@@ -6,7 +6,6 @@ use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\UserInterface;
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -181,9 +180,9 @@ final class JsonRpcServer implements RequestHandlerInterface
         return $e;
     }
 
-    private function updateLastModified(?DateTimeImmutable $current, ?DateTimeImmutable $updated): DateTimeImmutable
+    private function updateLastModified(?DateTimeImmutable $current, ?DateTimeImmutable $updated): ?DateTimeImmutable
     {
-        if (!$current || ($updated && $updated > $current)) {
+        if ($updated && $updated > $current) {
             $current = $updated;
         }
 
@@ -202,10 +201,10 @@ final class JsonRpcServer implements RequestHandlerInterface
         $this->logException($this->logger, $e);
     }
 
-    private function makeResponse(string $rpcResponse, DateTimeInterface $lastModified = null): ResponseInterface
+    private function makeResponse(string $rpcResponse, ?DateTimeInterface $lastModified = null): ResponseInterface
     {
         if (!$lastModified) {
-            $lastModified = new DateTime;
+            $lastModified = new DateTimeImmutable;
         }
 
         $value = gmdate("D, d M Y H:i:s \G\M\T", $lastModified->getTimestamp());

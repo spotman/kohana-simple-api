@@ -19,7 +19,7 @@ class ApiMethodAccessResolverFactory
     /**
      * ApiResourceFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder                     $factoryBuilder
      * @param \Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface $detector
      */
     public function __construct(

@@ -5,6 +5,8 @@ use Spotman\Api\AccessResolver\AclApiMethodAccessResolver;
 use Spotman\Api\ApiMethodInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiResourceInterface;
+use Spotman\Api\ArgumentsDefinition;
+use Spotman\Api\ArgumentsDefinitionInterface;
 
 abstract class AbstractApiMethod implements ApiMethodInterface
 {
@@ -73,5 +75,10 @@ abstract class AbstractApiMethod implements ApiMethodInterface
     protected function response($data = null): ?ApiMethodResponse
     {
         return ApiMethodResponse::factory($data);
+    }
+
+    protected function definition(): ArgumentsDefinitionInterface
+    {
+        return new ArgumentsDefinition;
     }
 }
