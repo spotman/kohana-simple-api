@@ -55,7 +55,7 @@ class ArgumentsDefinition implements ArgumentsDefinitionInterface
         return $this->rules;
     }
 
-    private function addRule(string $name, string $type, bool $optional, $default = null): ArgumentsDefinitionInterface
+    private function addRule(string $name, string $type, ?bool $optional, $default = null): ArgumentsDefinitionInterface
     {
         foreach ($this->rules as $rule) {
             if ($rule->getName() === $name) {
