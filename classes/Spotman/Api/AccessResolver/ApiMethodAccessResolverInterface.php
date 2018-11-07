@@ -3,14 +3,14 @@ namespace Spotman\Api\AccessResolver;
 
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodInterface;
-use Spotman\Api\ArgumentsInterface;
+use Spotman\Defence\ArgumentsInterface;
 
 interface ApiMethodAccessResolverInterface
 {
     /**
-     * @param \Spotman\Api\ApiMethodInterface $method
-     * @param \Spotman\Api\ArgumentsInterface $arguments
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Spotman\Api\ApiMethodInterface     $method
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @return bool
      */

@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Spotman\Api;
+namespace Spotman\Defence;
 
 class ArgumentsFacade
 {
     /**
-     * @param array                                     $requestArguments
-     * @param \Spotman\Api\ArgumentsDefinitionInterface $definition
+     * @param array                                         $requestArguments
+     * @param \Spotman\Defence\ArgumentsDefinitionInterface $definition
      *
-     * @return \Spotman\Api\ArgumentsInterface
+     * @return \Spotman\Defence\ArgumentsInterface
      */
     public function prepareArguments(
         array $requestArguments,
@@ -65,8 +65,8 @@ class ArgumentsFacade
     }
 
     /**
-     * @param array                                     $data
-     * @param \Spotman\Api\ArgumentsDefinitionInterface $definition
+     * @param array                                         $data
+     * @param \Spotman\Defence\ArgumentsDefinitionInterface $definition
      *
      * @return array
      */

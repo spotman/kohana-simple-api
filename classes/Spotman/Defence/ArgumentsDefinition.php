@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Spotman\Api;
+namespace Spotman\Defence;
 
 class ArgumentsDefinition implements ArgumentsDefinitionInterface
 {
     /**
-     * @var \Spotman\Api\ArgumentRuleInterface[]
+     * @var \Spotman\Defence\ArgumentRuleInterface[]
      */
     private $rules;
 

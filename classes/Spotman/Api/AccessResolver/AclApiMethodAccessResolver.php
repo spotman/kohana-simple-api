@@ -6,7 +6,7 @@ use Spotman\Acl\AclInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodInterface;
-use Spotman\Api\ArgumentsInterface;
+use Spotman\Defence\ArgumentsInterface;
 
 class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
 {
@@ -28,9 +28,9 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
     }
 
     /**
-     * @param \Spotman\Api\ApiMethodInterface $method
-     * @param \Spotman\Api\ArgumentsInterface $arguments
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Spotman\Api\ApiMethodInterface     $method
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @return bool
      * @throws \Spotman\Api\ApiMethodException

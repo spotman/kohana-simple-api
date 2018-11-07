@@ -5,8 +5,8 @@ use Spotman\Api\AccessResolver\AclApiMethodAccessResolver;
 use Spotman\Api\ApiMethodInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiResourceInterface;
-use Spotman\Api\ArgumentsDefinition;
-use Spotman\Api\ArgumentsDefinitionInterface;
+use Spotman\Defence\ArgumentsDefinition;
+use Spotman\Defence\ArgumentsDefinitionInterface;
 
 abstract class AbstractApiMethod implements ApiMethodInterface
 {

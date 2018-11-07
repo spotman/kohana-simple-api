@@ -8,7 +8,7 @@ use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodFactory;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiResourceFactory;
-use Spotman\Api\ArgumentsFacade;
+use Spotman\Defence\ArgumentsFacade;
 
 class InternalApiResourceProxy extends AbstractApiResourceProxy
 {
@@ -28,7 +28,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
     protected $accessResolverFactory;
 
     /**
-     * @var \Spotman\Api\ArgumentsFacade
+     * @var \Spotman\Defence\ArgumentsFacade
      */
     private $argumentsFacade;
 
@@ -39,7 +39,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
      * @param \Spotman\Api\ApiResourceFactory                            $resourceFactory
      * @param \Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory $accessResolverFactory
      * @param \Spotman\Api\ApiMethodFactory                              $methodFactory
-     * @param \Spotman\Api\ArgumentsFacade                               $argumentsFacade
+     * @param \Spotman\Defence\ArgumentsFacade                           $argumentsFacade
      *
      * @throws \BetaKiller\Factory\FactoryException
      */

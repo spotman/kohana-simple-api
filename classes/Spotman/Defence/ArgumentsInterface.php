@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Spotman\Api;
+namespace Spotman\Defence;
 
 interface ArgumentsInterface
 {
