@@ -2,7 +2,7 @@
 namespace Spotman\Api;
 
 use BetaKiller\Model\UserInterface;
-use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
 
 interface ApiMethodInterface
@@ -25,9 +25,9 @@ interface ApiMethodInterface
     public function getAccessResolverName(): string;
 
     /**
-     * @return \Spotman\Defence\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function getArgumentsDefinition(): ArgumentsDefinitionInterface;
+    public function getArgumentsDefinition(): DefinitionBuilderInterface;
 
     /**
      * @param \Spotman\Defence\ArgumentsInterface $arguments
