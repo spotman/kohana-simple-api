@@ -23,9 +23,9 @@ final class JsonRpcServerRequest
     private $methodName;
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $params = [];
+    private $params;
 
     /**
      * JsonRpcServerRequest constructor.
@@ -45,7 +45,7 @@ final class JsonRpcServerRequest
 
         $this->id = isset($body->id) ? (int)$body->id : null;
 
-        $this->params = isset($body->params) ? (array)$body->params : null;
+        $this->params = isset($body->params) ? (array)$body->params : [];
 
         $rawMethod = isset($body->method) ? (string)$body->method : null;
 
