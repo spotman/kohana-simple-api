@@ -3,7 +3,7 @@ namespace Spotman\Api;
 
 use Traversable;
 
-final class ApiMethodResponse
+final class ApiMethodResponse implements \JsonSerializable
 {
     private $data;
 
@@ -80,6 +80,19 @@ final class ApiMethodResponse
     public function getLastModified(): \DateTimeImmutable
     {
         return $this->lastModified;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return $this->asArray();
     }
 
     /**
