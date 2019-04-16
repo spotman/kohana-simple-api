@@ -2,6 +2,7 @@
 namespace Spotman\Api\ResourceProxy;
 
 use BetaKiller\Model\UserInterface;
+use InvalidArgumentException;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory;
 use Spotman\Api\ApiAccessViolationException;
 use Spotman\Api\ApiMethodException;
@@ -83,7 +84,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         try {
             // Prepare arguments from raw data and definition
             $arguments = $this->argumentsFacade->prepareArguments($argumentsArray, $definition);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             throw new ApiMethodException(':error in API :collection.:method', [
                 ':error'      => $e->getMessage(),
                 ':collection' => $methodInstance->getCollectionName(),
@@ -99,7 +100,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
             throw new ApiAccessViolationException('Access denied to ":collection.:method" for user ":user"', [
                 ':collection' => $resource->getName(),
                 ':method'     => $methodName,
-                ':user'       => $user->getID(),
+                ':user'       => $user->hasID() ? $user->getID() : 'Guest',
             ]);
         }
 
