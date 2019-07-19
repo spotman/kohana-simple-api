@@ -8,6 +8,7 @@ use Spotman\Api\ApiAccessViolationException;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodFactory;
 use Spotman\Api\ApiMethodResponse;
+use Spotman\Api\ApiMethodResponseConverterInterface;
 use Spotman\Api\ApiResourceFactory;
 use Spotman\Defence\ArgumentsFacade;
 
@@ -34,6 +35,11 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
     private $argumentsFacade;
 
     /**
+     * @var \Spotman\Api\ApiMethodResponseConverterInterface
+     */
+    private $converter;
+
+    /**
      * InternalApiResourceProxy constructor.
      *
      * @param string                                                     $resourceName
@@ -41,6 +47,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
      * @param \Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory $accessResolverFactory
      * @param \Spotman\Api\ApiMethodFactory                              $methodFactory
      * @param \Spotman\Defence\ArgumentsFacade                           $argumentsFacade
+     * @param \Spotman\Api\ApiMethodResponseConverterInterface           $converter
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
@@ -49,7 +56,8 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         ApiResourceFactory $resourceFactory,
         ApiMethodAccessResolverFactory $accessResolverFactory,
         ApiMethodFactory $methodFactory,
-        ArgumentsFacade $argumentsFacade
+        ArgumentsFacade $argumentsFacade,
+        ApiMethodResponseConverterInterface $converter
     ) {
         parent::__construct($resourceName);
 
@@ -57,6 +65,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         $this->accessResolverFactory = $accessResolverFactory;
         $this->methodFactory         = $methodFactory;
         $this->argumentsFacade       = $argumentsFacade;
+        $this->converter             = $converter;
     }
 
     /**
@@ -104,6 +113,11 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
             ]);
         }
 
-        return $methodInstance->execute($arguments, $user);
+        $response = $methodInstance->execute($arguments, $user);
+
+        // Cleanup data and cast it to array structures and scalar types
+        return $response
+            ? $this->converter->convert($response, $user)
+            : null;
     }
 }

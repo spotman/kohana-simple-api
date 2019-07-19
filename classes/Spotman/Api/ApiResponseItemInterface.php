@@ -4,9 +4,9 @@ namespace Spotman\Api;
 interface ApiResponseItemInterface
 {
     /**
-     * @return array|\Traversable
+     * @return callable
      */
-    public function getApiResponseData();
+    public function getApiResponseData(): callable;
 
     /**
      * @return \DateTimeImmutable|null
