@@ -104,7 +104,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
                 throw new ApiMethodException('Response must be callable');
             }
 
-            $response = $this->invoker->call($handler, ['user' => $user]);
+            $response = $this->invoker->call($handler, ['user' => $user, 'lang' => $user->getLanguage()]);
 
             return $this->convertResult($response, $lastModified, $user);
         }
@@ -118,8 +118,9 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         }
 
         throw new ApiMethodException(
-            'API model method may return objects implementing Traversable or ApiModelResponseItemInterface only'
-        );
+            'API may return objects implementing Traversable or ApiModelResponseItemInterface but :class provided', [
+            ':class' => get_class($object),
+        ]);
     }
 
     /**
