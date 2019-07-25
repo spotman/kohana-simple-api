@@ -9,6 +9,7 @@ use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodFactory;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiMethodResponseConverterInterface;
+use Spotman\Api\ApiMethodWithLangDefinitionInterface;
 use Spotman\Api\ApiResourceFactory;
 use Spotman\Defence\ArgumentsFacade;
 
@@ -115,9 +116,14 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
 
         $response = $methodInstance->execute($arguments, $user);
 
+        // Detect lang for Entities converter
+        $lang = $methodInstance instanceof ApiMethodWithLangDefinitionInterface
+            ? $methodInstance->detectLanguage($arguments)
+            : $user->getLanguage();
+
         // Cleanup data and cast it to array structures and scalar types
         return $response
-            ? $this->converter->convert($response, $user)
+            ? $this->converter->convert($response, $user, $lang)
             : null;
     }
 }
