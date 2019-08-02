@@ -119,7 +119,11 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         // Detect lang for Entities converter
         $lang = $methodInstance instanceof ApiMethodWithLangDefinitionInterface
             ? $methodInstance->detectLanguage($arguments)
-            : $user->getLanguage();
+            : null;
+
+        if (!$lang) {
+            $lang = $user->getLanguage();
+        }
 
         // Cleanup data and cast it to array structures and scalar types
         return $response
