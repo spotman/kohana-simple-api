@@ -5,6 +5,7 @@ use BetaKiller\Model\UserInterface;
 use InvalidArgumentException;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory;
 use Spotman\Api\ApiAccessViolationException;
+use Spotman\Api\ApiLanguageDetectorInterface;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodFactory;
 use Spotman\Api\ApiMethodResponse;
@@ -41,6 +42,11 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
     private $converter;
 
     /**
+     * @var \Spotman\Api\ApiLanguageDetectorInterface
+     */
+    private $langDetector;
+
+    /**
      * InternalApiResourceProxy constructor.
      *
      * @param string                                                     $resourceName
@@ -48,6 +54,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
      * @param \Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory $accessResolverFactory
      * @param \Spotman\Api\ApiMethodFactory                              $methodFactory
      * @param \Spotman\Defence\ArgumentsFacade                           $argumentsFacade
+     * @param \Spotman\Api\ApiLanguageDetectorInterface                  $langDetector
      * @param \Spotman\Api\ApiMethodResponseConverterInterface           $converter
      *
      * @throws \BetaKiller\Factory\FactoryException
@@ -58,6 +65,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         ApiMethodAccessResolverFactory $accessResolverFactory,
         ApiMethodFactory $methodFactory,
         ArgumentsFacade $argumentsFacade,
+        ApiLanguageDetectorInterface $langDetector,
         ApiMethodResponseConverterInterface $converter
     ) {
         parent::__construct($resourceName);
@@ -67,6 +75,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         $this->methodFactory         = $methodFactory;
         $this->argumentsFacade       = $argumentsFacade;
         $this->converter             = $converter;
+        $this->langDetector = $langDetector;
     }
 
     /**
@@ -114,16 +123,10 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
             ]);
         }
 
-        $response = $methodInstance->execute($arguments, $user);
-
         // Detect lang for Entities converter
-        $lang = $methodInstance instanceof ApiMethodWithLangDefinitionInterface
-            ? $methodInstance->detectLanguage($arguments)
-            : null;
+        $lang = $this->langDetector->detect($methodInstance, $arguments, $user);
 
-        if (!$lang) {
-            $lang = $user->getLanguage();
-        }
+        $response = $methodInstance->execute($arguments, $user);
 
         // Cleanup data and cast it to array structures and scalar types
         return $response
