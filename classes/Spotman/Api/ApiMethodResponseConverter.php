@@ -73,6 +73,10 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         UserInterface $user,
         LanguageInterface $lang
     ) {
+        if (is_callable($modelCallResult)) {
+            return $this->convertResultCallable($modelCallResult, $lastModified, $user, $lang);
+        }
+
         if (\is_object($modelCallResult)) {
             return $this->convertResultObject($modelCallResult, $lastModified, $user, $lang);
         }
@@ -82,6 +86,17 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         }
 
         return $this->convertResultSimple($modelCallResult);
+    }
+
+    private function convertResultCallable(
+        callable $handler,
+        DateTime $lastModified,
+        UserInterface $user,
+        LanguageInterface $lang
+    ) {
+        $response = $this->invoker->call($handler, ['user' => $user, 'lang' => $lang]);
+
+        return $this->convertResult($response, $lastModified, $user, $lang);
     }
 
     /**
@@ -114,9 +129,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
                 ]);
             }
 
-            $response = $this->invoker->call($handler, ['user' => $user, 'lang' => $lang]);
-
-            return $this->convertResult($response, $lastModified, $user, $lang);
+            return $this->convertResultCallable($handler, $lastModified, $user, $lang);
         }
 
         if ($object instanceof JsonSerializable) {
