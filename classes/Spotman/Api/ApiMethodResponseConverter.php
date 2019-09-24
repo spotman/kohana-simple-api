@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Spotman\Api;
 
+use BetaKiller\Exception;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\UserInterface;
 use DateTime;
@@ -73,6 +74,10 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         UserInterface $user,
         LanguageInterface $lang
     ) {
+        if ($modelCallResult === null || \is_scalar($modelCallResult)) {
+            return $this->convertResultSimple($modelCallResult);
+        }
+
         if (is_callable($modelCallResult)) {
             return $this->convertResultCallable($modelCallResult, $lastModified, $user, $lang);
         }
@@ -85,7 +90,9 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
             return $this->convertResultTraversable($modelCallResult, $lastModified, $user, $lang);
         }
 
-        return $this->convertResultSimple($modelCallResult);
+        throw new Exception('Unknown API response data type :what', [
+            ':what' => \gettype($modelCallResult),
+        ]);
     }
 
     private function convertResultCallable(
