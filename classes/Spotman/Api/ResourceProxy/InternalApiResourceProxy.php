@@ -10,7 +10,6 @@ use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodFactory;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiMethodResponseConverterInterface;
-use Spotman\Api\ApiMethodWithLangDefinitionInterface;
 use Spotman\Api\ApiResourceFactory;
 use Spotman\Defence\ArgumentsFacade;
 
@@ -75,7 +74,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         $this->methodFactory         = $methodFactory;
         $this->argumentsFacade       = $argumentsFacade;
         $this->converter             = $converter;
-        $this->langDetector = $langDetector;
+        $this->langDetector          = $langDetector;
     }
 
     /**
