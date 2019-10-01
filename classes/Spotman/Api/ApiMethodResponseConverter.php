@@ -38,6 +38,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
     }
 
     /**
+     * @param \Spotman\Api\ApiMethodInterface     $method
      * @param \Spotman\Api\ApiMethodResponse      $response
      * @param \BetaKiller\Model\UserInterface     $user
      * @param \BetaKiller\Model\LanguageInterface $lang
@@ -46,6 +47,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
      * @throws \Spotman\Api\ApiMethodException
      */
     public function convert(
+        ApiMethodInterface $method,
         ApiMethodResponse $response,
         UserInterface $user,
         LanguageInterface $lang
@@ -53,13 +55,14 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         $data         = $response->getData();
         $lastModified = (new DateTime)->setTimestamp($response->getLastModified()->getTimestamp());
 
-        $data         = $this->convertResult($data, $lastModified, $user, $lang);
+        $data         = $this->convertResult($method, $data, $lastModified, $user, $lang);
         $lastModified = (new DateTimeImmutable())->setTimestamp($lastModified->getTimestamp());
 
         return new ApiMethodResponse($data, $lastModified);
     }
 
     /**
+     * @param \Spotman\Api\ApiMethodInterface     $method
      * @param mixed                               $modelCallResult
      * @param \DateTime                           $lastModified
      * @param \BetaKiller\Model\UserInterface     $user
@@ -69,6 +72,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
      * @throws \Spotman\Api\ApiMethodException
      */
     private function convertResult(
+        ApiMethodInterface $method,
         $modelCallResult,
         DateTime $lastModified,
         UserInterface $user,
@@ -79,15 +83,15 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         }
 
         if (is_callable($modelCallResult)) {
-            return $this->convertResultCallable($modelCallResult, $lastModified, $user, $lang);
+            return $this->convertResultCallable($method, $modelCallResult, $lastModified, $user, $lang);
         }
 
         if (\is_object($modelCallResult)) {
-            return $this->convertResultObject($modelCallResult, $lastModified, $user, $lang);
+            return $this->convertResultObject($method, $modelCallResult, $lastModified, $user, $lang);
         }
 
         if (\is_array($modelCallResult)) {
-            return $this->convertResultTraversable($modelCallResult, $lastModified, $user, $lang);
+            return $this->convertResultTraversable($method, $modelCallResult, $lastModified, $user, $lang);
         }
 
         throw new Exception('Unknown API response data type :what', [
@@ -96,17 +100,23 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
     }
 
     private function convertResultCallable(
+        ApiMethodInterface $method,
         callable $handler,
         DateTime $lastModified,
         UserInterface $user,
         LanguageInterface $lang
     ) {
-        $response = $this->invoker->call($handler, ['user' => $user, 'lang' => $lang]);
+        $response = $this->invoker->call($handler, [
+            'method' => $method,
+            'user'   => $user,
+            'lang'   => $lang,
+        ]);
 
-        return $this->convertResult($response, $lastModified, $user, $lang);
+        return $this->convertResult($method, $response, $lastModified, $user, $lang);
     }
 
     /**
+     * @param \Spotman\Api\ApiMethodInterface     $method
      * @param                                     $object
      * @param \DateTime                           $lastModified
      * @param \BetaKiller\Model\UserInterface     $user
@@ -118,8 +128,13 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
      * @throws \Invoker\Exception\NotEnoughParametersException
      * @throws \Spotman\Api\ApiMethodException
      */
-    private function convertResultObject($object, DateTime $lastModified, UserInterface $user, LanguageInterface $lang)
-    {
+    private function convertResultObject(
+        ApiMethodInterface $method,
+        $object,
+        DateTime $lastModified,
+        UserInterface $user,
+        LanguageInterface $lang
+    ) {
         if ($object instanceof ApiResponseItemInterface) {
             // Get item`s last modified time for setting it in current response
             $lm = $object->getApiLastModified();
@@ -136,7 +151,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
                 ]);
             }
 
-            return $this->convertResultCallable($handler, $lastModified, $user, $lang);
+            return $this->convertResultCallable($method, $handler, $lastModified, $user, $lang);
         }
 
         if ($object instanceof JsonSerializable) {
@@ -144,7 +159,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         }
 
         if ($object instanceof Traversable) {
-            return $this->convertResultTraversable($object, $lastModified, $user, $lang);
+            return $this->convertResultTraversable($method, $object, $lastModified, $user, $lang);
         }
 
         throw new ApiMethodException(
@@ -154,6 +169,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
     }
 
     /**
+     * @param \Spotman\Api\ApiMethodInterface     $method
      * @param array|\Traversable                  $traversable
      * @param \DateTime                           $lastModified
      * @param \BetaKiller\Model\UserInterface     $user
@@ -163,6 +179,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
      * @throws \Spotman\Api\ApiMethodException
      */
     private function convertResultTraversable(
+        ApiMethodInterface $method,
         $traversable,
         DateTime $lastModified,
         UserInterface $user,
@@ -171,7 +188,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         $data = [];
 
         foreach ($traversable as $key => $value) {
-            $data[$key] = $this->convertResult($value, $lastModified, $user, $lang);
+            $data[$key] = $this->convertResult($method, $value, $lastModified, $user, $lang);
         }
 
         return $data;

@@ -9,6 +9,8 @@ use BetaKiller\Model\UserInterface;
 interface ApiMethodResponseConverterInterface
 {
     /**
+     * @param \Spotman\Api\ApiMethodInterface     $method
+     *
      * @param \Spotman\Api\ApiMethodResponse      $response
      * @param \BetaKiller\Model\UserInterface     $user
      * @param \BetaKiller\Model\LanguageInterface $lang
@@ -16,6 +18,7 @@ interface ApiMethodResponseConverterInterface
      * @return \Spotman\Api\ApiMethodResponse
      */
     public function convert(
+        ApiMethodInterface $method,
         ApiMethodResponse $response,
         UserInterface $user,
         LanguageInterface $lang

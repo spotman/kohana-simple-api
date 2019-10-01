@@ -129,7 +129,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
 
         // Cleanup data and cast it to array structures and scalar types
         return $response
-            ? $this->converter->convert($response, $user, $lang)
+            ? $this->converter->convert($methodInstance, $response, $user, $lang)
             : null;
     }
 }
