@@ -155,7 +155,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         }
 
         if ($object instanceof JsonSerializable) {
-            return $object->jsonSerialize();
+            return $this->convertResult($method, $object->jsonSerialize(), $lastModified, $user, $lang);
         }
 
         if ($object instanceof Traversable) {
