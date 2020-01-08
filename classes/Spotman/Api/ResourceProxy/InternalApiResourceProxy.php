@@ -12,6 +12,7 @@ use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiMethodResponseConverterInterface;
 use Spotman\Api\ApiResourceFactory;
 use Spotman\Defence\ArgumentsFacade;
+use Spotman\Defence\DefinitionBuilder;
 
 class InternalApiResourceProxy extends AbstractApiResourceProxy
 {
@@ -96,12 +97,14 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         // Creating method instance (inject current user in ApiMethod)
         $methodInstance = $this->methodFactory->createMethod($resource->getName(), $methodName);
 
+        $builder = new DefinitionBuilder();
+
         // Get arguments definition
-        $definition = $methodInstance->getArgumentsDefinition();
+        $methodInstance->defineArguments($builder);
 
         try {
             // Prepare arguments from raw data and definition
-            $arguments = $this->argumentsFacade->prepareArguments($argumentsArray, $definition);
+            $arguments = $this->argumentsFacade->prepareArguments($argumentsArray, $builder);
         } catch (InvalidArgumentException $e) {
             throw new ApiMethodException(':error in API :collection.:method', [
                 ':error'      => $e->getMessage(),

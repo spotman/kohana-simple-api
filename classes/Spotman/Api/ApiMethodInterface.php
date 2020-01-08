@@ -25,9 +25,11 @@ interface ApiMethodInterface
     public function getAccessResolverName(): string;
 
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
+     *
+     * @return void
      */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface;
+    public function defineArguments(DefinitionBuilderInterface $builder): void;
 
     /**
      * @param \Spotman\Defence\ArgumentsInterface $arguments

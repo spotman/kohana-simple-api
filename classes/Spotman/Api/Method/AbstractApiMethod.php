@@ -76,9 +76,4 @@ abstract class AbstractApiMethod implements ApiMethodInterface
     {
         return ApiMethodResponse::factory($data);
     }
-
-    protected function definition(): DefinitionBuilderInterface
-    {
-        return new DefinitionBuilder;
-    }
 }
