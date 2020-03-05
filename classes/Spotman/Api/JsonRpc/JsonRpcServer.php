@@ -3,7 +3,7 @@ namespace Spotman\Api\JsonRpc;
 
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Exception\HttpExceptionInterface;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\UserInterface;
 use DateTimeImmutable;
@@ -23,8 +23,6 @@ use Throwable;
 
 final class JsonRpcServer implements RequestHandlerInterface
 {
-    use LoggerHelperTrait;
-
     /**
      * @var ResponseFactoryInterface
      */
@@ -198,7 +196,7 @@ final class JsonRpcServer implements RequestHandlerInterface
      */
     private function processException(\Throwable $e): void
     {
-        $this->logException($this->logger, $e);
+        LoggerHelper::logException($this->logger, $e);
     }
 
     private function makeResponse(string $rpcResponse, ?DateTimeInterface $lastModified = null): ResponseInterface
