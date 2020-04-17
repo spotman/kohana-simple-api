@@ -196,7 +196,7 @@ final class JsonRpcServer implements RequestHandlerInterface
      */
     private function processException(\Throwable $e): void
     {
-        LoggerHelper::logException($this->logger, $e);
+        LoggerHelper::logRawException($this->logger, $e);
     }
 
     private function makeResponse(string $rpcResponse, ?DateTimeInterface $lastModified = null): ResponseInterface
