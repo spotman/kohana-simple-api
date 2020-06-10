@@ -35,8 +35,10 @@ final class ApiRequestHandler implements RequestHandlerInterface
     {
         $route = Route::fromRequest($request);
 
-        $server = $this->serverFactory->createApiServerByType($route->getType(), $route->getVersion());
+        $server = $this->serverFactory->createApiServerByType($route->getType(), );
 
-        return $server->handle($request);
+        return $server->handle(
+            $request->withAttribute(ApiServerInterface::API_VERSION_REQUEST_ATTR, $route->getVersion())
+        );
     }
 }

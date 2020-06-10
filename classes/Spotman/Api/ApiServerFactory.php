@@ -29,35 +29,31 @@ class ApiServerFactory
     }
 
     /**
-     * @param int      $type
-     * @param int|null $version
+     * @param int $type
      *
      * @return \Spotman\Api\ApiServerInterface
      * @throws \Spotman\Api\ApiException
      */
-    public function createApiServerByType(int $type, $version = null): ApiServerInterface
+    public function createApiServerByType(int $type): ApiServerInterface
     {
         $name = ApiTypesHelper::typeToName($type);
 
-        return $this->createApiServerByName($name, $version);
+        return $this->createApiServerByName($name);
     }
 
     /**
-     * @param string   $name
-     * @param int|null $version
+     * @param string $name
      *
      * @return \Spotman\Api\ApiServerInterface
      * @throws \Spotman\Api\ApiException
      */
-    public function createApiServerByName(string $name, $version = null): ApiServerInterface
+    public function createApiServerByName(string $name): ApiServerInterface
     {
         if (!$this->isServerEnabled()) {
             throw new ApiException('API server is not enabled');
         }
 
         $className = '\\Spotman\\Api\\Server\\ApiServer'.$name;
-
-        // TODO Deal with version
 
         $server = $this->container->get($className);
 

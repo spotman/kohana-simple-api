@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Spotman\Api\ApiAccessViolationException;
 use Spotman\Api\ApiFacade;
 use Spotman\Api\ApiMethodResponse;
+use Spotman\Api\ApiServerInterface;
 use Spotman\Api\JsonRpc\Exception\HttpJsonRpcException;
 use Spotman\Api\JsonRpc\Exception\InternalErrorJsonRpcException;
 use Spotman\Api\JsonRpc\Exception\InvalidRequestJsonRpcException;
@@ -59,6 +60,9 @@ final class JsonRpcServer implements RequestHandlerInterface
 
             $body = \json_decode($rawBody);
             $user = ServerRequestHelper::getUser($httpRequest);
+
+            // TODO Deal with version
+            $version = (int)$httpRequest->getAttribute(ApiServerInterface::API_VERSION_REQUEST_ATTR);
 
             if (\is_array($body)) {
                 $batchData    = $this->processBatch($body, $user);
