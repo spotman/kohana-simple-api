@@ -118,9 +118,10 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
 
         // Security check
         if (!$resolverInstance->isMethodAllowed($methodInstance, $arguments, $user)) {
-            throw new ApiAccessViolationException('Access denied to ":collection.:method" for user ":user"', [
+            throw new ApiAccessViolationException('Access denied to ":collection.:method:id" for user ":user"', [
                 ':collection' => $resource->getName(),
                 ':method'     => $methodName,
+                ':id'         => $arguments->hasID() ? '('.$arguments->getID().')' : '',
                 ':user'       => $user->hasID() ? $user->getID() : 'Guest',
             ]);
         }
