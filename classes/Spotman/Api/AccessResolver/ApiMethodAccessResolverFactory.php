@@ -1,29 +1,32 @@
 <?php
 namespace Spotman\Api\AccessResolver;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use Spotman\Api\ApiMethodInterface;
 
 class ApiMethodAccessResolverFactory
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * @var \Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface
      */
-    private $accessResolverDetector;
+    private ApiMethodAccessResolverDetectorInterface $accessResolverDetector;
 
     /**
      * ApiResourceFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder                     $factoryBuilder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface            $factoryBuilder
      * @param \Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface $detector
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function __construct(
-        NamespaceBasedFactoryBuilder $factoryBuilder,
+        NamespaceBasedFactoryBuilderInterface $factoryBuilder,
         ApiMethodAccessResolverDetectorInterface $detector
     ) {
         $this->accessResolverDetector = $detector;

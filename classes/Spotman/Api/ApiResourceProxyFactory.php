@@ -1,29 +1,32 @@
 <?php
 namespace Spotman\Api;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 
 class ApiResourceProxyFactory
 {
     /**
      * @var string[]
      */
-    protected $typeToName = [
+    protected array $typeToName = [
         ApiResourceProxyInterface::INTERNAL => 'Internal',
         ApiResourceProxyInterface::EXTERNAL => 'External',
     ];
 
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    protected $factory;
+    protected NamespaceBasedFactoryInterface $factory;
 
     /**
      * ApiResourceProxyFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $factoryBuilder
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $factoryBuilder)
     {
         $this->factory = $factoryBuilder
             ->createFactory()
