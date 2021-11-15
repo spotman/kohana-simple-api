@@ -87,7 +87,17 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         }
 
         if (\is_object($modelCallResult)) {
-            return $this->convertResultObject($method, $modelCallResult, $lastModified, $user, $lang);
+            $startedAt = microtime(true);
+            $result = $this->convertResultObject($method, $modelCallResult, $lastModified, $user, $lang);
+            $executedIn = (microtime(true) - $startedAt) * 1000;
+
+            if (is_array($result) && $user->isDeveloper()) {
+                $result += [
+                    '_performance_' => (int)$executedIn,
+                ];
+            }
+
+            return $result;
         }
 
         if (\is_array($modelCallResult)) {
