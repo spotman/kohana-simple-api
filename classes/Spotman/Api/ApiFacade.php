@@ -5,12 +5,12 @@ use BetaKiller\Config\ConfigProviderInterface;
 
 class ApiFacade
 {
-    public const CONFIG_CLIENT_TYPE    = ['api', 'client', 'type'];
-    public const CONFIG_CLIENT_HOST    = ['api', 'client', 'host'];
-    public const CONFIG_CLIENT_VERSION = ['api', 'client', 'version'];
-    public const CONFIG_CLIENT_PROXY   = ['api', 'client', 'proxy'];
-
-    public const CONFIG_SERVER_ENABLED = ['api', 'server', 'enabled'];
+    public const CONFIG_GROUP          = 'api';
+    public const CONFIG_CLIENT_TYPE    = ['client', 'type'];
+    public const CONFIG_CLIENT_HOST    = ['client', 'host'];
+    public const CONFIG_CLIENT_VERSION = ['client', 'version'];
+    public const CONFIG_CLIENT_PROXY   = ['client', 'proxy'];
+    public const CONFIG_SERVER_ENABLED = ['server', 'enabled'];
 
     /**
      * @var \Spotman\Api\ApiResourceProxyFactory
@@ -47,7 +47,8 @@ class ApiFacade
     public function getResource(string $resourceName, ?int $proxyType = null): ApiResourceProxyInterface
     {
         if ($proxyType === null) {
-            $proxyType = (int)$this->configProvider->load(self::CONFIG_CLIENT_PROXY) ?: ApiResourceProxyInterface::INTERNAL;
+            $proxyType = (int)$this->configProvider->load(ApiFacade::CONFIG_GROUP, self::CONFIG_CLIENT_PROXY)
+                ?: ApiResourceProxyInterface::INTERNAL;
         }
 
         return $this->createResourceProxy($proxyType, $resourceName);
