@@ -1,4 +1,5 @@
 <?php
+
 namespace Spotman\Api\JsonRpc;
 
 use BetaKiller\Auth\AccessDeniedException;
@@ -15,12 +16,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Spotman\Api\ApiAccessViolationException;
 use Spotman\Api\ApiFacade;
-use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiServerInterface;
 use Spotman\Api\JsonRpc\Exception\HttpJsonRpcException;
 use Spotman\Api\JsonRpc\Exception\InternalErrorJsonRpcException;
 use Spotman\Api\JsonRpc\Exception\InvalidRequestJsonRpcException;
 use Throwable;
+
+use function is_int;
 
 final class JsonRpcServer implements RequestHandlerInterface
 {
@@ -52,19 +54,18 @@ final class JsonRpcServer implements RequestHandlerInterface
         $lastModified = null;
 
         try {
-            $rawBody = $httpRequest->getBody()->getContents();
+            $body = (array)$httpRequest->getParsedBody();
 
-            if (!$rawBody) {
+            if (!$body) {
                 throw new InvalidRequestJsonRpcException;
             }
 
-            $body = \json_decode($rawBody);
             $user = ServerRequestHelper::getUser($httpRequest);
 
             // TODO Deal with version
             $version = (int)$httpRequest->getAttribute(ApiServerInterface::API_VERSION_REQUEST_ATTR);
 
-            if (\is_array($body)) {
+            if (is_int(key($body))) {
                 $batchData    = $this->processBatch($body, $user);
                 $batchResults = [];
 
@@ -134,8 +135,6 @@ final class JsonRpcServer implements RequestHandlerInterface
         // Make response
         $response = JsonRpcServerResponse::factory()->setId($request->getId());
 
-        $lastModified = new DateTimeImmutable;
-
         try {
             // Get class/method names
             $resourceName = $request->getResourceName();
@@ -146,13 +145,10 @@ final class JsonRpcServer implements RequestHandlerInterface
                 ->getResource($resourceName)
                 ->call($methodName, $request->getParams(), $user);
 
-            if (\is_object($result) && $result instanceof ApiMethodResponse) {
-                $lastModified = $result->getLastModified();
-                $result       = $result->getData();
-            }
-
             // Make response
-            $response->succeeded($result)->setLastModified($lastModified);
+            $response
+                ->succeeded($result->getData())
+                ->setLastModified($result->getLastModified());
         } catch (Throwable $e) {
             $this->processException($e);
             $e = $this->wrapException($e);
@@ -206,7 +202,7 @@ final class JsonRpcServer implements RequestHandlerInterface
     private function makeResponse(string $rpcResponse, ?DateTimeInterface $lastModified = null): ResponseInterface
     {
         if (!$lastModified) {
-            $lastModified = new DateTimeImmutable;
+            $lastModified = new DateTimeImmutable();
         }
 
         $value = gmdate("D, d M Y H:i:s \G\M\T", $lastModified->getTimestamp());

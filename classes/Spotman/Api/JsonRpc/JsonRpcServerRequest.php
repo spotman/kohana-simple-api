@@ -5,65 +5,73 @@ namespace Spotman\Api\JsonRpc;
 
 use Spotman\Api\JsonRpc\Exception\InvalidRequestJsonRpcException;
 
+use function count;
+
 final class JsonRpcServerRequest
 {
     /**
-     * @var int
+     * @var int|null
      */
-    private $id;
+    private int|null $id;
 
     /**
      * @var string
      */
-    private $resourceName;
+    private string $resourceName;
 
     /**
      * @var string
      */
-    private $methodName;
+    private string $methodName;
 
     /**
-     * @var mixed[]
+     * @var array
      */
-    private $params;
+    private array $params;
 
     /**
      * JsonRpcServerRequest constructor.
      *
-     * @param object $body
+     * @param array $body
+     *
+     * @throws \Spotman\Api\JsonRpc\Exception\InvalidRequestJsonRpcException
      */
-    public function __construct($body)
+    public function __construct(array $body)
     {
-        if (!$body || !\is_object($body)) {
-            throw new InvalidRequestJsonRpcException;
+        if (!$body) {
+            throw new InvalidRequestJsonRpcException();
         }
 
         // Check protocol version
-        if (!isset($body->jsonrpc) || $body->jsonrpc !== '2.0') {
-            throw new InvalidRequestJsonRpcException;
+        if (!isset($body['jsonrpc']) || $body['jsonrpc'] !== '2.0') {
+            throw new InvalidRequestJsonRpcException();
         }
 
-        $this->id = isset($body->id) ? (int)$body->id : null;
+        $this->id = isset($body['id']) ? (int)$body['id'] : null;
 
-        $this->params = isset($body->params) ? (array)$body->params : [];
+        $this->params = isset($body['params']) ? (array)$body['params'] : [];
 
-        $rawMethod = isset($body->method) ? (string)$body->method : null;
+        $rawMethod = isset($body['method']) ? (string)$body['method'] : null;
 
         if (!$rawMethod) {
-            throw new InvalidRequestJsonRpcException;
+            throw new InvalidRequestJsonRpcException('Missing method name');
         }
 
         $rawMethodArray = explode('.', $rawMethod);
 
-        if (\count($rawMethodArray) !== 2) {
-            throw new InvalidRequestJsonRpcException;
+        if (count($rawMethodArray) !== 2) {
+            throw new InvalidRequestJsonRpcException('Wrong method format, use "resource.method"');
         }
 
         $this->resourceName = $rawMethodArray[0];
         $this->methodName   = $rawMethodArray[1];
 
-        if (!$this->resourceName || !$this->methodName) {
-            throw new InvalidRequestJsonRpcException;
+        if (!$this->resourceName) {
+            throw new InvalidRequestJsonRpcException('Missing resource name');
+        }
+
+        if (!$this->methodName) {
+            throw new InvalidRequestJsonRpcException('Missing method name');
         }
     }
 
