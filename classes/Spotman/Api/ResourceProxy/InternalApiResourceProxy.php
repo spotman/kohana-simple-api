@@ -1,4 +1,5 @@
 <?php
+
 namespace Spotman\Api\ResourceProxy;
 
 use BetaKiller\Model\UserInterface;
@@ -10,92 +11,49 @@ use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodFactory;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiMethodResponseConverterInterface;
-use Spotman\Api\ApiResourceFactory;
 use Spotman\Defence\ArgumentsFacade;
 use Spotman\Defence\DefinitionBuilder;
 
-class InternalApiResourceProxy extends AbstractApiResourceProxy
+readonly class InternalApiResourceProxy extends AbstractApiResourceProxy
 {
-    /**
-     * @var \Spotman\Api\ApiResourceInterface
-     */
-    protected $resourceInstance;
-
-    /**
-     * @var \Spotman\Api\ApiMethodFactory
-     */
-    protected $methodFactory;
-
-    /**
-     * @var \Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory
-     */
-    protected $accessResolverFactory;
-
-    /**
-     * @var \Spotman\Defence\ArgumentsFacade
-     */
-    private $argumentsFacade;
-
-    /**
-     * @var \Spotman\Api\ApiMethodResponseConverterInterface
-     */
-    private $converter;
-
-    /**
-     * @var \Spotman\Api\ApiLanguageDetectorInterface
-     */
-    private $langDetector;
-
     /**
      * InternalApiResourceProxy constructor.
      *
-     * @param string                                                     $resourceName
-     * @param \Spotman\Api\ApiResourceFactory                            $resourceFactory
      * @param \Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory $accessResolverFactory
      * @param \Spotman\Api\ApiMethodFactory                              $methodFactory
      * @param \Spotman\Defence\ArgumentsFacade                           $argumentsFacade
      * @param \Spotman\Api\ApiLanguageDetectorInterface                  $langDetector
      * @param \Spotman\Api\ApiMethodResponseConverterInterface           $converter
      *
-     * @throws \BetaKiller\Factory\FactoryException
      */
     public function __construct(
-        string $resourceName,
-        ApiResourceFactory $resourceFactory,
-        ApiMethodAccessResolverFactory $accessResolverFactory,
-        ApiMethodFactory $methodFactory,
-        ArgumentsFacade $argumentsFacade,
-        ApiLanguageDetectorInterface $langDetector,
-        ApiMethodResponseConverterInterface $converter
+        private ApiMethodAccessResolverFactory $accessResolverFactory,
+        private ApiMethodFactory $methodFactory,
+        private ArgumentsFacade $argumentsFacade,
+        private ApiLanguageDetectorInterface $langDetector,
+        private ApiMethodResponseConverterInterface $converter
     ) {
-        parent::__construct($resourceName);
-
-        $this->resourceInstance      = $resourceFactory->create($resourceName);
-        $this->accessResolverFactory = $accessResolverFactory;
-        $this->methodFactory         = $methodFactory;
-        $this->argumentsFacade       = $argumentsFacade;
-        $this->converter             = $converter;
-        $this->langDetector          = $langDetector;
     }
 
     /**
+     * @param string                          $resourceName
      * @param string                          $methodName
      * @param array                           $argumentsArray
      * @param \BetaKiller\Model\UserInterface $user
      *
-     * @return \Spotman\Api\ApiMethodResponse
+     * @return \Spotman\Api\ApiMethodResponse|null
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \Spotman\Api\ApiAccessViolationException
+     * @throws \Spotman\Api\ApiMethodException
      */
     protected function callResourceMethod(
+        string $resourceName,
         string $methodName,
         array $argumentsArray,
         UserInterface $user
     ): ?ApiMethodResponse {
-        $resource = $this->resourceInstance;
-
         // Creating method instance (inject current user in ApiMethod)
-        $methodInstance = $this->methodFactory->createMethod($resource->getName(), $methodName);
+        $methodInstance = $this->methodFactory->createMethod($resourceName, $methodName);
 
         $builder = new DefinitionBuilder();
 
@@ -108,8 +66,8 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         } catch (InvalidArgumentException $e) {
             throw new ApiMethodException(':error in API :collection.:method', [
                 ':error'      => $e->getMessage(),
-                ':collection' => $methodInstance->getCollectionName(),
-                ':method'     => $methodInstance->getName(),
+                ':collection' => $methodInstance::getCollectionName(),
+                ':method'     => $methodInstance::getName(),
             ], 0, $e);
         }
 
@@ -119,7 +77,7 @@ class InternalApiResourceProxy extends AbstractApiResourceProxy
         // Security check
         if (!$resolverInstance->isMethodAllowed($methodInstance, $arguments, $user)) {
             throw new ApiAccessViolationException('Access denied to ":collection.:method:id" for user ":user"', [
-                ':collection' => $resource->getName(),
+                ':collection' => $resourceName,
                 ':method'     => $methodName,
                 ':id'         => $arguments->hasID() ? '('.$arguments->getID().')' : '',
                 ':user'       => $user->hasID() ? $user->getID() : 'Guest',

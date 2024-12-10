@@ -1,62 +1,53 @@
 <?php
+
 namespace Spotman\Api\Method;
 
 use Spotman\Api\AccessResolver\AclApiMethodAccessResolver;
 use Spotman\Api\ApiMethodInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiResourceInterface;
-use Spotman\Defence\DefinitionBuilder;
-use Spotman\Defence\DefinitionBuilderInterface;
 
-abstract class AbstractApiMethod implements ApiMethodInterface
+abstract readonly class AbstractApiMethod implements ApiMethodInterface
 {
     /**
-     * @var string
-     */
-    private $methodName;
-
-    /**
-     * @var string
-     */
-    private $collectionName;
-
-    /**
      * @return string
      */
-    public function getName(): string
+    public static function getCollectionName(): string
     {
-        if (!$this->methodName) {
-            $this->parseClassName();
-        }
-
-        return $this->methodName;
-    }
-
-    private function parseClassName(): void
-    {
-        $className = static::class;
-        $parts     = explode('\\', $className);
-        $baseName  = array_pop($parts);
-
-        // Methods are in camelCase notation
-        $this->methodName = lcfirst(str_replace(ApiMethodInterface::SUFFIX, '', $baseName));
-
-        // Lastly placed namespace is collection name
-        $collectionName = array_pop($parts);
-
-        $this->collectionName = str_replace(ApiResourceInterface::SUFFIX, '', $collectionName);
+        return static::parseClassName()[0];
     }
 
     /**
      * @return string
      */
-    public function getCollectionName(): string
+    public static function getName(): string
     {
-        if (!$this->collectionName) {
-            $this->parseClassName();
+        return static::parseClassName()[1];
+    }
+
+    private static function parseClassName(): array
+    {
+        static $methodName;
+        static $collectionName;
+
+        if (!$collectionName || !$methodName) {
+            $className = static::class;
+            $parts     = explode('\\', $className);
+            $baseName  = array_pop($parts);
+
+            // Methods are in camelCase notation
+            $methodName = lcfirst(str_replace(ApiMethodInterface::SUFFIX, '', $baseName));
+
+            // Lastly placed namespace is collection name
+            $collectionName = array_pop($parts);
+
+            $collectionName = str_replace(ApiResourceInterface::SUFFIX, '', $collectionName);
         }
 
-        return $this->collectionName;
+        return [
+            $collectionName,
+            $methodName
+        ];
     }
 
     /**
@@ -70,9 +61,9 @@ abstract class AbstractApiMethod implements ApiMethodInterface
     /**
      * @param mixed|null $data
      *
-     * @return \Spotman\Api\ApiMethodResponse
+     * @return \Spotman\Api\ApiMethodResponse|null
      */
-    protected function response($data = null): ?ApiMethodResponse
+    protected function response(mixed $data = null): ?ApiMethodResponse
     {
         return ApiMethodResponse::factory($data);
     }

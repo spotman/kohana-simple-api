@@ -1,4 +1,5 @@
 <?php
+
 namespace Spotman\Api;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
@@ -37,18 +38,17 @@ class ApiResourceProxyFactory
     }
 
     /**
-     * @param int    $type
-     * @param string $modelName
+     * @param int $type
      *
      * @return \Spotman\Api\ApiResourceProxyInterface
      * @throws \Spotman\Api\ApiResourceProxyException
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createFromType(int $type, string $modelName): ApiResourceProxyInterface
+    public function createFromType(int $type): ApiResourceProxyInterface
     {
         $name = $this->getNameFromType($type);
 
-        return $this->createFromName($name, $modelName);
+        return $this->createFromName($name);
     }
 
     /**
@@ -68,13 +68,12 @@ class ApiResourceProxyFactory
 
     /**
      * @param string $proxyName
-     * @param string $modelName
      *
      * @return \Spotman\Api\ApiResourceProxyInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createFromName(string $proxyName, string $modelName): ApiResourceProxyInterface
+    public function createFromName(string $proxyName): ApiResourceProxyInterface
     {
-        return $this->factory->create($proxyName, ['resourceName' => $modelName]);
+        return $this->factory->create($proxyName);
     }
 }

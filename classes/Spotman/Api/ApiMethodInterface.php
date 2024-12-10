@@ -12,12 +12,12 @@ interface ApiMethodInterface
     /**
      * @return string
      */
-    public function getName(): string;
+    public static function getName(): string;
 
     /**
      * @return string
      */
-    public function getCollectionName(): string;
+    public static function getCollectionName(): string;
 
     /**
      * @return string

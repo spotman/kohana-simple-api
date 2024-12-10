@@ -1,4 +1,5 @@
 <?php
+
 namespace Spotman\Api\AccessResolver;
 
 use BetaKiller\Model\UserInterface;
@@ -8,23 +9,17 @@ use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodInterface;
 use Spotman\Defence\ArgumentsInterface;
 
-class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
+readonly class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
 {
     public const CODENAME = 'Acl';
-
-    /**
-     * @var \Spotman\Acl\AclInterface
-     */
-    protected $acl;
 
     /**
      * AclApiMethodAccessResolver constructor.
      *
      * @param \Spotman\Acl\AclInterface $acl
      */
-    public function __construct(AclInterface $acl)
+    public function __construct(private AclInterface $acl)
     {
-        $this->acl = $acl;
     }
 
     /**
@@ -44,7 +39,7 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
 
         $this->prepareResource($resource, $method, $arguments, $user);
 
-        $aclPermissionName = $method->getName();
+        $aclPermissionName = $method::getName();
 
         return $resource->isPermissionAllowed($aclPermissionName);
     }
@@ -57,13 +52,13 @@ class AclApiMethodAccessResolver implements ApiMethodAccessResolverInterface
      */
     protected function getAclResourceFromApiMethod(ApiMethodInterface $method): ResolvingResourceInterface
     {
-        $aclResourceName = $method->getCollectionName();
+        $aclResourceName = $method::getCollectionName();
 
         $resource = $this->acl->getResource($aclResourceName);
 
         if (!($resource instanceof ResolvingResourceInterface)) {
             throw new ApiMethodException('Api method [:method] must provide acl resource implementing :interface', [
-                ':method'    => $method->getCollectionName().'.'.$method->getName(),
+                ':method'    => $method::getCollectionName().'.'.$method::getName(),
                 ':interface' => ResolvingResourceInterface::class,
             ]);
         }

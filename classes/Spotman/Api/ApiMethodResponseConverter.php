@@ -93,7 +93,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
 
             if (is_array($result) && is_string(array_key_first($result)) && $user->isDeveloper()) {
                 $result += [
-                    '_performance_' => (int)$executedIn,
+                    '__perf__' => round($executedIn, 1),
                 ];
             }
 
