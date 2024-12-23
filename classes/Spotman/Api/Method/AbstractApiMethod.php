@@ -65,6 +65,6 @@ abstract readonly class AbstractApiMethod implements ApiMethodInterface
      */
     protected function response(mixed $data = null): ?ApiMethodResponse
     {
-        return ApiMethodResponse::factory($data);
+        return ApiMethodResponse::custom($data);
     }
 }

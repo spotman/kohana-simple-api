@@ -1,44 +1,53 @@
 <?php
+
 namespace Spotman\Api;
 
+use DateTimeImmutable;
 use JsonSerializable;
 
-final class ApiMethodResponse implements JsonSerializable
+final readonly class ApiMethodResponse implements JsonSerializable
 {
-    private $data;
+    private const STATUS_OK    = 'ok';
+    private const STATUS_ERROR = 'error';
 
-    /**
-     * @var \DateTimeImmutable Timestamp of the last change
-     */
-    private $lastModified;
-
-    /**
-     * @param mixed|null         $data
-     * @param \DateTimeImmutable $lastModified
-     *
-     * @return \Spotman\Api\ApiMethodResponse
-     */
-    public static function factory($data = null, \DateTimeImmutable $lastModified = null): ApiMethodResponse
+    public static function ok(mixed $data = null, DateTimeImmutable $lastModified = null): self
     {
-        return new self($data, $lastModified);
+        return new self($data, $lastModified, self::STATUS_OK);
+    }
+
+    public static function error(mixed $data = null, DateTimeImmutable $lastModified = null): self
+    {
+        return new self($data, $lastModified, self::STATUS_ERROR);
+    }
+
+    public static function custom(mixed $data = null, DateTimeImmutable $lastModified = null, ?string $status = null): ApiMethodResponse
+    {
+        return new self($data, $lastModified, $status);
     }
 
     /**
      * ApiMethodResponse constructor.
      *
-     * @param                    $data
-     * @param \DateTimeImmutable $lastModified
+     * @param null                    $data         Result data
+     * @param \DateTimeImmutable|null $lastModified Timestamp of the last change
+     * @param string|null             $status       Result status
      */
-    public function __construct($data = null, \DateTimeImmutable $lastModified = null)
+    private function __construct(
+        private mixed $data = null,
+        private ?DateTimeImmutable $lastModified = null,
+        private ?string $status = null
+    ) {
+    }
+
+    public function getStatus(): string
     {
-        $this->data         = $data;
-        $this->lastModified = $lastModified ?? new \DateTimeImmutable;
+        return $this->status ?? self::STATUS_OK;
     }
 
     /**
      * @return mixed
      */
-    public function getData()
+    public function getData(): mixed
     {
         return $this->data;
     }
@@ -46,9 +55,9 @@ final class ApiMethodResponse implements JsonSerializable
     /**
      * @return \DateTimeImmutable
      */
-    public function getLastModified(): \DateTimeImmutable
+    public function getLastModified(): DateTimeImmutable
     {
-        return $this->lastModified;
+        return $this->lastModified ?? new DateTimeImmutable();
     }
 
     /**

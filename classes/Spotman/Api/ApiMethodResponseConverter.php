@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Spotman\Api;
@@ -52,13 +53,14 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         UserInterface $user,
         LanguageInterface $lang
     ): ApiMethodResponse {
+        $status       = $response->getStatus();
         $data         = $response->getData();
-        $lastModified = (new DateTime)->setTimestamp($response->getLastModified()->getTimestamp());
+        $lastModified = (new DateTime())->setTimestamp($response->getLastModified()->getTimestamp());
 
         $data         = $this->convertResult($method, $data, $lastModified, $user, $lang);
         $lastModified = (new DateTimeImmutable())->setTimestamp($lastModified->getTimestamp());
 
-        return new ApiMethodResponse($data, $lastModified);
+        return ApiMethodResponse::custom($data, $lastModified, $status);
     }
 
     /**
@@ -87,8 +89,8 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         }
 
         if (\is_object($modelCallResult)) {
-            $startedAt = microtime(true);
-            $result = $this->convertResultObject($method, $modelCallResult, $lastModified, $user, $lang);
+            $startedAt  = microtime(true);
+            $result     = $this->convertResultObject($method, $modelCallResult, $lastModified, $user, $lang);
             $executedIn = (microtime(true) - $startedAt) * 1000;
 
             if (is_array($result) && is_string(array_key_first($result)) && $user->isDeveloper()) {
@@ -175,7 +177,8 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
         throw new ApiMethodException(
             'API may return objects implementing Traversable or ApiModelResponseItemInterface but :class provided', [
             ':class' => get_class($object),
-        ]);
+        ]
+        );
     }
 
     /**

@@ -26,19 +26,7 @@ abstract readonly class AbstractApiResourceProxy implements ApiResourceProxyInte
         $response = $this->callResourceMethod($resourceName, $methodName, $arguments, $user);
 
         // For methods with empty response
-        if ($response === null) {
-            $response = ApiMethodResponse::factory();
-        }
-
-        if (!($response instanceof ApiMethodResponse)) {
-            throw new ApiResourceProxyException('Api model method [:model.:method] must return :must or null', [
-                ':model'  => $resourceName,
-                ':method' => $methodName,
-                ':must'   => ApiMethodResponse::class,
-            ]);
-        }
-
-        return $response;
+        return $response ?? ApiMethodResponse::custom();
     }
 
     /**
