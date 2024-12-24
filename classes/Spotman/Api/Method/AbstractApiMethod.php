@@ -46,7 +46,7 @@ abstract readonly class AbstractApiMethod implements ApiMethodInterface
 
         return [
             $collectionName,
-            $methodName
+            $methodName,
         ];
     }
 
@@ -66,5 +66,10 @@ abstract readonly class AbstractApiMethod implements ApiMethodInterface
     protected function response(mixed $data = null): ?ApiMethodResponse
     {
         return ApiMethodResponse::custom($data);
+    }
+
+    protected function customResponse(string $status, mixed $data = null): ?ApiMethodResponse
+    {
+        return ApiMethodResponse::custom($data, null, $status);
     }
 }
