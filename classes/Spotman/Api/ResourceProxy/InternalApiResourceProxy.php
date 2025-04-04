@@ -2,6 +2,7 @@
 
 namespace Spotman\Api\ResourceProxy;
 
+use BetaKiller\Api\Method\EntityBasedApiMethodInterface;
 use BetaKiller\Model\UserInterface;
 use InvalidArgumentException;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverFactory;
@@ -11,6 +12,7 @@ use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodFactory;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiMethodResponseConverterInterface;
+use Spotman\Api\EntityDetectorInterface;
 use Spotman\Defence\ArgumentsFacade;
 use Spotman\Defence\DefinitionBuilder;
 
@@ -24,14 +26,15 @@ readonly class InternalApiResourceProxy extends AbstractApiResourceProxy
      * @param \Spotman\Defence\ArgumentsFacade                           $argumentsFacade
      * @param \Spotman\Api\ApiLanguageDetectorInterface                  $langDetector
      * @param \Spotman\Api\ApiMethodResponseConverterInterface           $converter
-     *
+     * @param \Spotman\Api\EntityDetectorInterface                       $entityDetector
      */
     public function __construct(
         private ApiMethodAccessResolverFactory $accessResolverFactory,
         private ApiMethodFactory $methodFactory,
         private ArgumentsFacade $argumentsFacade,
         private ApiLanguageDetectorInterface $langDetector,
-        private ApiMethodResponseConverterInterface $converter
+        private ApiMethodResponseConverterInterface $converter,
+        private EntityDetectorInterface $entityDetector
     ) {
     }
 
@@ -89,9 +92,13 @@ readonly class InternalApiResourceProxy extends AbstractApiResourceProxy
 
         $response = $methodInstance->execute($arguments, $user);
 
+        $entity = $methodInstance instanceof EntityBasedApiMethodInterface
+            ? $this->entityDetector->getEntity($methodInstance, $arguments)
+            : null;
+
         // Cleanup data and cast it to array structures and scalar types
         return $response
-            ? $this->converter->convert($methodInstance, $response, $user, $lang)
+            ? $this->converter->convert($methodInstance, $response, $user, $lang, $entity)
             : null;
     }
 }
