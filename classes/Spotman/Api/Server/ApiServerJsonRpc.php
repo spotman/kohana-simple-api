@@ -1,25 +1,20 @@
 <?php
+
 namespace Spotman\Api\Server;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Api\JsonRpc\JsonRpcServer;
 
-class ApiServerJsonRpc extends ApiServerAbstract
+final readonly class ApiServerJsonRpc extends ApiServerAbstract
 {
-    /**
-     * @var \Spotman\Api\JsonRpc\JsonRpcServer
-     */
-    private $server;
-
     /**
      * ApiServerJsonRpc constructor.
      *
      * @param \Spotman\Api\JsonRpc\JsonRpcServer $server
      */
-    public function __construct(JsonRpcServer $server)
+    public function __construct(private JsonRpcServer $server)
     {
-        $this->server = $server;
     }
 
     /**

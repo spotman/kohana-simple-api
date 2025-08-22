@@ -35,7 +35,7 @@ class ApiClientFactory
         $className = '\\Spotman\\Api\\Client\\ApiClient'.$name;
 
         if (!class_exists($className)) {
-            throw new ApiException('Can not find API client for :name', [':name' => $name]);
+            throw new ApiException('Can not find API client class :name', [':name' => $className]);
         }
 
         $client = $className($type, $host, $version);
@@ -59,21 +59,6 @@ class ApiClientFactory
         $type    = (string)$this->configProvider->load(ApiFacade::CONFIG_GROUP, ApiFacade::CONFIG_CLIENT_TYPE);
         $host    = (string)$this->configProvider->load(ApiFacade::CONFIG_GROUP, ApiFacade::CONFIG_CLIENT_HOST);
         $version = (string)$this->configProvider->load(ApiFacade::CONFIG_GROUP, ApiFacade::CONFIG_CLIENT_VERSION);
-
-        return $this->createApiClientByType($type, $host, $version);
-    }
-
-    /**
-     * @param string   $name
-     * @param string   $host
-     * @param int|null $version
-     *
-     * @return \Spotman\Api\ApiClientInterface
-     * @throws \Spotman\Api\ApiException
-     */
-    public function createApiClientByName($name, $host, $version = null): ApiClientInterface
-    {
-        $type = ApiTypesHelper::nameToType($name);
 
         return $this->createApiClientByType($type, $host, $version);
     }
