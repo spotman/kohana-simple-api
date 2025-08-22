@@ -2,6 +2,7 @@
 
 namespace Spotman\Api\Method;
 
+use DateTimeImmutable;
 use Spotman\Api\AccessResolver\AclApiMethodAccessResolver;
 use Spotman\Api\ApiMethodInterface;
 use Spotman\Api\ApiMethodResponse;
@@ -66,6 +67,16 @@ abstract readonly class AbstractApiMethod implements ApiMethodInterface
     protected function response(mixed $data = null): ?ApiMethodResponse
     {
         return ApiMethodResponse::custom($data);
+    }
+
+    protected function successResponse(mixed $data = null, DateTimeImmutable $lastModified = null): ?ApiMethodResponse
+    {
+        return ApiMethodResponse::ok($data, $lastModified);
+    }
+
+    protected function errorResponse(mixed $data = null): ?ApiMethodResponse
+    {
+        return ApiMethodResponse::error($data);
     }
 
     protected function customResponse(string $status, mixed $data = null): ?ApiMethodResponse
