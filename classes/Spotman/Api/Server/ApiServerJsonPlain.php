@@ -3,6 +3,7 @@
 namespace Spotman\Api\Server;
 
 use BetaKiller\Auth\AccessDeniedException;
+use BetaKiller\Error\ExceptionService;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\Exception\ServerErrorHttpException;
@@ -21,7 +22,7 @@ use Throwable;
 
 final readonly class ApiServerJsonPlain extends ApiServerAbstract
 {
-    public function __construct(private ApiFacade $api, private LoggerInterface $logger)
+    public function __construct(private ApiFacade $api, private ExceptionService $exceptionService, private LoggerInterface $logger)
     {
     }
 
@@ -81,7 +82,10 @@ final readonly class ApiServerJsonPlain extends ApiServerAbstract
     {
         $e = $this->wrapException($e);
 
-        $response = ResponseHelper::errorJson($e->getMessage(), $e->getCode());
+        $message  = $this->exceptionService->getExceptionMessage($e);
+        $httpCode = $this->exceptionService->getHttpCode($e);
+
+        $response = ResponseHelper::errorJson($message, $httpCode);
         $response = ResponseHelper::disableCaching($response);
 
         return $response;
