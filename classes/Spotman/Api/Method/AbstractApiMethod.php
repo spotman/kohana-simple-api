@@ -28,22 +28,26 @@ abstract readonly class AbstractApiMethod implements ApiMethodInterface
 
     private static function parseClassName(): array
     {
-        static $methodName;
-        static $collectionName;
+        static $namesCache = [];
 
-        if (!$collectionName || !$methodName) {
-            $className = static::class;
-            $parts     = explode('\\', $className);
-            $baseName  = array_pop($parts);
+        $name = static::class;
 
-            // Methods are in camelCase notation
-            $methodName = lcfirst(str_replace(ApiMethodInterface::SUFFIX, '', $baseName));
+        return $namesCache[$name] ??= self::getClassNameInfo();
+    }
 
-            // Lastly placed namespace is collection name
-            $collectionName = array_pop($parts);
+    private static function getClassNameInfo(): array
+    {
+        $className = static::class;
+        $parts     = explode('\\', $className);
+        $baseName  = array_pop($parts);
 
-            $collectionName = str_replace(ApiResourceInterface::SUFFIX, '', $collectionName);
-        }
+        // Methods are in camelCase notation
+        $methodName = lcfirst(str_replace(ApiMethodInterface::SUFFIX, '', $baseName));
+
+        // Lastly placed namespace is collection name
+        $collectionName = array_pop($parts);
+
+        $collectionName = str_replace(ApiResourceInterface::SUFFIX, '', $collectionName);
 
         return [
             $collectionName,
