@@ -66,24 +66,24 @@ abstract readonly class AbstractApiMethod implements ApiMethodInterface
     /**
      * @param mixed|null $data
      *
-     * @return \Spotman\Api\ApiMethodResponse|null
+     * @return \Spotman\Api\ApiMethodResponse
      */
-    protected function response(mixed $data = null): ?ApiMethodResponse
+    protected function response(mixed $data = null): ApiMethodResponse
     {
         return ApiMethodResponse::custom($data);
     }
 
-    protected function successResponse(mixed $data = null, DateTimeImmutable $lastModified = null): ?ApiMethodResponse
+    protected function successResponse(mixed $data = null, DateTimeImmutable $lastModified = null): ApiMethodResponse
     {
         return ApiMethodResponse::ok($data, $lastModified);
     }
 
-    protected function errorResponse(mixed $data = null): ?ApiMethodResponse
+    protected function errorResponse(mixed $data = null): ApiMethodResponse
     {
         return ApiMethodResponse::error($data);
     }
 
-    protected function customResponse(string $status, mixed $data = null): ?ApiMethodResponse
+    protected function customResponse(string $status, mixed $data = null): ApiMethodResponse
     {
         return ApiMethodResponse::custom($data, null, $status);
     }
