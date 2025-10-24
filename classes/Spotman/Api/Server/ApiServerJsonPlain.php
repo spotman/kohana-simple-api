@@ -58,7 +58,7 @@ final readonly class ApiServerJsonPlain extends ApiServerAbstract
             // TODO Deal with version
             $version = (int)$request->getAttribute(ApiServerInterface::API_VERSION_REQUEST_ATTR);
 
-            $rpcResponse = $this->api->getProxy()->call($resourceName, $methodName, $body, $user);
+            $rpcResponse = $this->api->call($resourceName, $methodName, $body, $user);
 
             // Send response
             return $this->makeSuccessResponse($rpcResponse);

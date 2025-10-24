@@ -24,7 +24,7 @@ abstract readonly class AbstractCallableApiResource extends AbstractApiResource
     protected function call(string $methodName, array $arguments, UserInterface $user): ApiMethodResponse
     {
         // Forward call to API subsystem
-        return $this->api->getProxy()->call($this->getName(), $methodName, $arguments, $user);
+        return $this->api->call($this->getName(), $methodName, $arguments, $user);
     }
 }
 

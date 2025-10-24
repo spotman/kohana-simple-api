@@ -141,7 +141,7 @@ final class JsonRpcServer implements RequestHandlerInterface
             $methodName   = $request->getMethodName();
 
             // Call proxy object method
-            $result = $this->api->getProxy()->call($resourceName, $methodName, $request->getParams(), $user);
+            $result = $this->api->call($resourceName, $methodName, $request->getParams(), $user);
 
             // Make response
             $response
