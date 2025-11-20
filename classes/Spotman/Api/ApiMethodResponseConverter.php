@@ -16,12 +16,13 @@ use Traversable;
 
 final class ApiMethodResponseConverter implements ApiMethodResponseConverterInterface
 {
-    private static $allowedResultTypes = [
+    private static array $allowedResultTypes = [
         'null',
         'boolean',
         'string',
         'integer',
         'double',
+        'float',
     ];
 
     public function __construct(private InvokerInterface $invoker)
@@ -212,7 +213,7 @@ final class ApiMethodResponseConverter implements ApiMethodResponseConverterInte
     {
         $type = gettype($data);
 
-        if (!in_array(strtolower($type), static::$allowedResultTypes, true)) {
+        if (!in_array(strtolower($type), self::$allowedResultTypes, true)) {
             throw new ApiMethodException('API model must not return values of type :type', [':type' => $type]);
         }
 
